@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الفاخر الأوراس | عيدان تحريك خشبية فاخرة</title>
+<meta name="description" content="الفاخر الأوراس — عيدان تحريك قهوة خشبية طبيعية 100%، صناعة جزائرية فاخرة بجودة عالمية.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+:root{
+  --black:#0a0806;
+  --black-soft:#120e0a;
+  --panel:#17120c;
+  --gold-1:#a9824a;
+  --gold-2:#e8cd94;
+  --gold-3:#f6e6bd;
+  --gold-deep:#7c5c2e;
+  --beige:#c9ab7c;
+  --brown:#2e1c10;
+  --brown-2:#4a2f1a;
+  --green:#4c5f43;
+  --white-soft:#f2ede2;
+  --white-dim:rgba(242,237,226,0.72);
+  --hairline:rgba(232,205,148,0.18);
+  --font-display:'Alexandria', sans-serif;
+  --font-body:'IBM Plex Sans Arabic', sans-serif;
+  --font-label:'Tajawal', sans-serif;
+}
+body{
+  font-family:var(--font-body);
+  background:var(--black);
+  color:var(--white-soft);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::selection{background:var(--gold-1);color:var(--black);}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+}
+
+/* ============ UTILITIES ============ */
+.gold-text{
+  background:linear-gradient(90deg, var(--gold-1) 0%, var(--gold-3) 45%, var(--gold-2) 65%, var(--gold-1) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.eyebrow{
+  font-family:var(--font-label);
+  font-size:13px;
+  letter-spacing:0.15em;
+  color:var(--gold-2);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:500;
+  margin-bottom:18px;
+}
+.eyebrow::before{
+  content:'';
+  width:28px;height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold-1));
+}
+.section-wrap{
+  position:relative;
+  width:100%;
+  min-height:100vh;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+}
+.bg-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:0;
+}
+.overlay{
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+.container{
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:1440px;
+  margin:0 auto;
+  padding:0 6vw;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:16px 38px;
+  border-radius:100px;
+  font-family:var(--font-label);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:0.02em;
+  transition:transform .5s cubic-bezier(.19,1,.22,1), box-shadow .5s ease, background .5s ease;
+  white-space:nowrap;
+}
+.btn-gold{
+  background:linear-gradient(135deg, var(--gold-1), var(--gold-3) 55%, var(--gold-1));
+  color:#1a1208;
+  box-shadow:0 8px 30px -8px rgba(232,205,148,0.5);
+}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 14px 40px -8px rgba(232,205,148,0.65);}
+.btn-ghost{
+  border:1px solid var(--hairline);
+  color:var(--white-soft);
+  backdrop-filter:blur(6px);
+  background:rgba(255,255,255,0.02);
+}
+.btn-ghost:hover{border-color:var(--gold-1);background:rgba(232,205,148,0.08);transform:translateY(-3px);}
+
+.stick-divider{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  margin:0 auto 26px;
+}
+.stick-divider svg{width:20px;height:34px;opacity:.85;}
+
+h1,h2,h3{font-family:var(--font-display);font-weight:800;line-height:1.15;}
+
+/* ============ CUSTOM CURSOR / STIR PROGRESS ============ */
+#stir-progress{
+  position:fixed;
+  left:18px;
+  top:50%;
+  transform:translateY(-50%);
+  width:26px;
+  height:150px;
+  z-index:200;
+  display:none;
+}
+@media(min-width:1000px){#stir-progress{display:block;}}
+#stir-progress .track{position:absolute;right:12px;top:0;bottom:0;width:1px;background:rgba(232,205,148,0.18);}
+#stir-progress .fill{position:absolute;right:12px;bottom:0;width:1px;background:linear-gradient(180deg, var(--gold-3), var(--gold-1));height:0%;transition:height .1s linear;}
+#stir-progress .stick{position:absolute;right:6px;bottom:0;width:13px;height:34px;transition:bottom .1s linear;}
+
+/* ============ NAV ============ */
+header{
+  position:fixed;top:0;right:0;left:0;z-index:100;
+  padding:22px 6vw;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .5s ease, padding .5s ease, backdrop-filter .5s ease, border-color .5s ease;
+  border-bottom:1px solid transparent;
+}
+header.scrolled{
+  background:rgba(10,8,6,0.82);
+  backdrop-filter:blur(16px);
+  padding:14px 6vw;
+  border-color:var(--hairline);
+}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:19px;
+  letter-spacing:0.01em;
+}
+.logo-mark-img{height:34px;width:auto;flex-shrink:0;filter:drop-shadow(0 2px 8px rgba(232,205,148,0.25));}
+nav.main-nav{display:none;}
+@media(min-width:980px){
+  nav.main-nav{display:flex;gap:38px;align-items:center;font-family:var(--font-label);font-size:14.5px;color:var(--white-dim);}
+  nav.main-nav a{position:relative;transition:color .35s ease;padding:4px 0;}
+  nav.main-nav a::after{content:'';position:absolute;bottom:-2px;right:0;width:0;height:1px;background:var(--gold-2);transition:width .4s cubic-bezier(.19,1,.22,1);}
+  nav.main-nav a:hover{color:var(--white-soft);}
+  nav.main-nav a:hover::after{width:100%;}
+}
+.nav-cta{display:none;}
+@media(min-width:980px){.nav-cta{display:inline-flex;padding:11px 26px;font-size:13.5px;}}
+.burger{
+  display:flex;flex-direction:column;gap:5px;width:26px;z-index:150;
+}
+@media(min-width:980px){.burger{display:none;}}
+.burger span{height:1.5px;background:var(--white-soft);width:100%;transition:transform .35s ease, opacity .35s ease;}
+.burger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.burger.open span:nth-child(2){opacity:0;}
+.burger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+.mobile-menu{
+  position:fixed;inset:0;background:rgba(8,6,4,0.98);z-index:120;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;
+  opacity:0;pointer-events:none;transition:opacity .5s ease;
+  font-family:var(--font-display);font-size:26px;font-weight:600;
+}
+.mobile-menu.open{opacity:1;pointer-events:all;}
+.mobile-menu a{color:var(--white-soft);}
+
+/* ============ HERO ============ */
+#hero{min-height:100svh;}
+#hero .overlay{
+  background:linear-gradient(90deg, rgba(8,6,4,0.55) 0%, rgba(8,6,4,0.15) 45%, rgba(8,6,4,0.05) 60%), linear-gradient(0deg, rgba(6,4,2,0.55), transparent 40%);
+}
+.hero-content{
+  max-width:620px;
+  margin-inline-start:auto;
+  text-align:right;
+  padding-top:70px;
+}
+.hero-content h1{
+  font-size:clamp(38px,5.6vw,68px);
+  margin-bottom:22px;
+}
+.hero-content p{
+  font-size:clamp(16px,1.6vw,19px);
+  color:var(--white-dim);
+  line-height:1.85;
+  max-width:480px;
+  margin-inline-start:auto;
+  margin-bottom:40px;
+  font-weight:300;
+}
+.hero-btns{display:flex;gap:16px;justify-content:flex-end;flex-wrap:wrap;}
+.scroll-cue{
+  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:var(--white-dim);font-family:var(--font-label);font-size:11.5px;letter-spacing:.12em;
+  z-index:2;
+}
+.scroll-cue .line{width:1px;height:44px;background:linear-gradient(180deg, var(--gold-2), transparent);position:relative;overflow:hidden;}
+.scroll-cue .line::after{content:'';position:absolute;top:-100%;right:0;width:100%;height:100%;background:var(--gold-3);animation:scrolldrop 2.2s ease-in-out infinite;}
+@keyframes scrolldrop{0%{top:-100%;}60%{top:100%;}100%{top:100%;}}
+
+/* particles */
+.particles{position:absolute;inset:0;z-index:1;pointer-events:none;}
+.particles span{
+  position:absolute;bottom:-10px;
+  width:3px;height:3px;border-radius:50%;
+  background:var(--gold-2);
+  opacity:.55;
+  animation:floatup linear infinite;
+}
+@keyframes floatup{
+  0%{transform:translateY(0) translateX(0);opacity:0;}
+  10%{opacity:.6;}
+  90%{opacity:.3;}
+  100%{transform:translateY(-100vh) translateX(20px);opacity:0;}
+}
+
+/* ============ GENERIC SECTION TEXT BLOCKS ============ */
+.text-block{max-width:560px;}
+.text-block.align-right{margin-inline-start:auto;text-align:right;}
+.text-block.align-center{margin-inline:auto;text-align:center;}
+.text-block h2{font-size:clamp(30px,3.6vw,48px);margin-bottom:22px;}
+.text-block p{font-size:16px;line-height:1.95;color:var(--white-dim);font-weight:300;margin-bottom:16px;}
+
+/* ============ ABOUT ============ */
+#about .overlay{background:linear-gradient(90deg, rgba(8,6,4,0.5) 0%, rgba(8,6,4,0.1) 42%, transparent 58%);}
+.trait-list{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;justify-content:flex-end;}
+.trait-pill{
+  border:1px solid var(--hairline);
+  padding:10px 20px;border-radius:100px;
+  font-family:var(--font-label);font-size:13.5px;color:var(--gold-2);
+  background:rgba(20,15,9,0.4);backdrop-filter:blur(6px);
+}
+
+/* ============ FEATURES ============ */
+#features{padding:130px 0;min-height:auto;}
+#features .overlay{background:linear-gradient(180deg, rgba(6,4,2,0.4), rgba(6,4,2,0.75) 70%, rgba(6,4,2,0.9));}
+.features-head{text-align:center;max-width:640px;margin:0 auto 64px;}
+.features-head h2{font-size:clamp(30px,3.8vw,50px);}
+.feature-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--hairline);
+  border:1px solid var(--hairline);
+  border-radius:22px;overflow:hidden;
+}
+@media(max-width:900px){.feature-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:520px){.feature-grid{grid-template-columns:1fr;}}
+.feature-card{
+  background:rgba(15,11,7,0.72);
+  backdrop-filter:blur(14px);
+  padding:38px 26px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;
+  transition:background .5s ease, transform .5s cubic-bezier(.19,1,.22,1);
+}
+.feature-card:hover{background:rgba(30,22,14,0.85);transform:translateY(-6px);}
+.feature-card .icon{
+  width:46px;height:46px;border-radius:50%;
+  border:1px solid var(--gold-deep);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold-2);font-size:18px;
+}
+.feature-card span.label{font-family:var(--font-label);font-size:14.5px;color:var(--white-soft);font-weight:500;line-height:1.6;}
+
+/* ============ PACKAGING ============ */
+#packaging{background:#000;}
+#packaging .overlay{background:linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.05) 50%, transparent 65%), linear-gradient(0deg, rgba(0,0,0,.5), transparent 30%);}
+.pack-list{margin-top:30px;display:flex;flex-direction:column;gap:14px;align-items:flex-end;}
+.pack-item{display:flex;align-items:center;gap:12px;font-family:var(--font-label);font-size:15.5px;color:var(--white-dim);}
+.pack-item .dot{width:6px;height:6px;border-radius:50%;background:var(--gold-2);flex-shrink:0;}
+
+/* ============ GALLERY ============ */
+#gallery{padding:130px 0;background:var(--black-soft);}
+.gallery-head{text-align:center;max-width:600px;margin:0 auto 60px;}
+.gallery-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+}
+@media(max-width:860px){.gallery-grid{grid-template-columns:1fr;}}
+.gallery-item{
+  position:relative;border-radius:20px;overflow:hidden;
+  aspect-ratio:4/5;
+  border:1px solid var(--hairline);
+}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.19,1,.22,1);}
+.gallery-item:hover img{transform:scale(1.08);}
+.gallery-caption{
+  position:absolute;inset-inline:0;bottom:0;padding:26px 22px;
+  background:linear-gradient(0deg, rgba(6,4,2,0.92), transparent 75%);
+}
+.gallery-caption h3{font-family:var(--font-display);font-size:19px;color:var(--white-soft);margin-bottom:4px;font-weight:600;}
+.gallery-caption p{font-family:var(--font-label);font-size:13px;color:var(--gold-2);}
+
+/* ============ EXPERIENCE (gallery3 use as emotional story) ============ */
+#experience .overlay{background:linear-gradient(90deg, rgba(6,4,2,0.6) 0%, rgba(6,4,2,0.2) 46%, transparent 62%);}
+
+/* ============ STATISTICS ============ */
+#stats .overlay{background:linear-gradient(90deg, rgba(6,4,2,0.15) 0%, rgba(6,4,2,0.55) 55%, rgba(6,4,2,0.85) 100%);}
+.stats-panel{margin-inline-start:auto;max-width:560px;text-align:right;}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px 20px;margin-top:38px;}
+.stat-item{text-align:right;border-inline-end:1px solid var(--hairline);padding-inline-end:20px;}
+.stat-item:nth-child(2n){border-inline-end:none;}
+.stat-num{font-family:var(--font-display);font-weight:800;font-size:clamp(28px,3.2vw,42px);display:flex;justify-content:flex-end;}
+.stat-label{font-family:var(--font-label);font-size:13.5px;color:var(--white-dim);margin-top:6px;}
+.suit-row{display:flex;gap:12px;margin-top:34px;flex-wrap:wrap;justify-content:flex-end;}
+.suit-pill{border:1px solid var(--hairline);border-radius:100px;padding:9px 18px;font-family:var(--font-label);font-size:13px;color:var(--gold-2);background:rgba(0,0,0,0.25);}
+
+/* ============ ORDER ============ */
+#order{padding:130px 0;}
+#order .overlay{background:radial-gradient(ellipse at center, rgba(6,4,2,0.2) 0%, rgba(6,4,2,0.72) 75%);}
+.order-wrap{display:flex;justify-content:center;}
+.order-card{
+  width:100%;max-width:640px;
+  background:rgba(18,14,9,0.55);
+  backdrop-filter:blur(22px);
+  border:1px solid var(--hairline);
+  border-radius:28px;
+  padding:clamp(28px,4vw,54px);
+  box-shadow:0 30px 80px -20px rgba(0,0,0,0.6);
+}
+.order-head{text-align:center;margin-bottom:36px;}
+.order-head h2{font-size:clamp(26px,3vw,36px);margin-bottom:10px;}
+.order-head p{color:var(--white-dim);font-size:14.5px;font-weight:300;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:560px){.form-grid{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:8px;}
+.field.full{grid-column:1/-1;}
+.field label{font-family:var(--font-label);font-size:13px;color:var(--gold-2);}
+.field input,.field select{
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--hairline);
+  border-radius:12px;
+  padding:14px 16px;
+  color:var(--white-soft);
+  font-family:var(--font-body);
+  font-size:14.5px;
+  transition:border-color .35s ease, background .35s ease;
+}
+.field input::placeholder{color:rgba(242,237,226,0.35);}
+.field input:focus,.field select:focus{outline:none;border-color:var(--gold-1);background:rgba(255,255,255,0.07);}
+.qty-row{display:flex;align-items:center;gap:14px;}
+.qty-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--hairline);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--gold-2);transition:background .3s ease,border-color .3s ease;flex-shrink:0;}
+.qty-btn:hover{background:rgba(232,205,148,0.1);border-color:var(--gold-1);}
+.qty-num{flex:1;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:700;}
+.price-summary{
+  margin-top:26px;padding:22px 24px;border-radius:16px;
+  background:linear-gradient(135deg, rgba(232,205,148,0.09), rgba(232,205,148,0.02));
+  border:1px solid var(--hairline);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+}
+.price-summary .lbl{font-family:var(--font-label);font-size:14px;color:var(--white-dim);}
+.price-summary .unit{font-size:12px;color:var(--white-dim);opacity:.7;display:block;margin-top:2px;}
+.price-summary .total{font-family:var(--font-display);font-size:26px;font-weight:800;}
+.submit-btn{width:100%;margin-top:26px;justify-content:center;padding:18px;font-size:16px;}
+.form-note{text-align:center;font-size:12px;color:var(--white-dim);opacity:.65;margin-top:16px;font-family:var(--font-label);}
+
+/* ============ TESTIMONIALS ============ */
+#testimonials{min-height:auto;padding-top:120px;padding-bottom:70px;}
+#testimonials .overlay{background:linear-gradient(0deg, rgba(6,4,2,0.92) 30%, rgba(6,4,2,0.35) 68%, rgba(6,4,2,0.75));}
+.test-head{text-align:center;max-width:600px;margin:0 auto 54px;}
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+@media(max-width:900px){.test-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto;}}
+.test-card{
+  background:rgba(20,15,9,0.55);
+  backdrop-filter:blur(16px);
+  border:1px solid var(--hairline);
+  border-radius:20px;
+  padding:32px 26px;
+  display:flex;flex-direction:column;gap:18px;
+}
+.stars{display:flex;gap:4px;color:var(--gold-2);font-size:14px;justify-content:flex-end;}
+.test-card p.quote{font-size:15px;line-height:1.9;color:var(--white-dim);font-weight:300;}
+.test-person{display:flex;align-items:center;gap:12px;justify-content:flex-end;margin-top:auto;}
+.test-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold-1),var(--brown-2));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;color:#1a1208;font-size:15px;}
+.test-name{text-align:right;}
+.test-name .n{font-family:var(--font-label);font-size:14px;font-weight:700;color:var(--white-soft);}
+.test-name .r{font-size:12px;color:var(--white-dim);}
+
+/* ============ FOOTER ============ */
+footer{position:relative;min-height:80vh;display:flex;align-items:center;overflow:hidden;}
+footer .overlay{background:radial-gradient(ellipse at center, rgba(6,4,2,0.15), rgba(6,4,2,0.65) 80%);}
+.footer-inner{position:relative;z-index:2;text-align:center;max-width:640px;margin:0 auto;padding:0 6vw;}
+.footer-logo{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:26px;}
+.footer-logo-img{width:120px;height:auto;filter:drop-shadow(0 4px 18px rgba(232,205,148,0.3));}
+.footer-logo .name{font-family:var(--font-display);font-size:26px;font-weight:800;}
+.footer-tag{font-family:var(--font-label);font-size:14px;color:var(--white-dim);margin-bottom:38px;}
+.footer-links{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:34px;font-family:var(--font-label);font-size:14px;color:var(--white-dim);}
+.footer-links a{transition:color .3s ease;}
+.footer-links a:hover{color:var(--gold-2);}
+.footer-contact{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;margin-bottom:36px;font-size:13.5px;color:var(--white-dim);font-family:var(--font-label);}
+.footer-contact span{display:flex;align-items:center;gap:8px;}
+.social-row{display:flex;justify-content:center;gap:16px;margin-bottom:44px;}
+.social-row a{
+  width:42px;height:42px;border-radius:50%;border:1px solid var(--hairline);
+  display:flex;align-items:center;justify-content:center;color:var(--gold-2);
+  transition:background .3s ease, transform .3s ease, border-color .3s ease;
+}
+.social-row a:hover{background:rgba(232,205,148,0.1);border-color:var(--gold-1);transform:translateY(-3px);}
+.footer-bottom{border-top:1px solid var(--hairline);padding-top:24px;font-size:12px;color:var(--white-dim);opacity:.65;font-family:var(--font-label);}
+
+/* ============ REVEAL ANIMATION HELPERS ============ */
+.reveal{opacity:0;transform:translateY(40px);}
+.reveal-scale{opacity:0;transform:scale(0.94);}
+
+/* scrollbar */
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:var(--gold-deep);border-radius:10px;}
+</style>
+</head>
+<body>
+
+<!-- STIR PROGRESS INDICATOR -->
+<div id="stir-progress" aria-hidden="true">
+  <div class="track"></div>
+  <div class="fill" id="stirFill"></div>
+</div>
+
+<!-- HEADER -->
+<header id="siteHeader">
+  <a href="#hero" class="logo">
+    <img src="images/logo.png" alt="شعار الفاخر الأوراس" class="logo-mark-img">
+    <span class="gold-text">الفاخر الأوراس</span>
+  </a>
+  <nav class="main-nav">
+    <a href="#hero">الرئيسية</a>
+    <a href="#about">من نحن</a>
+    <a href="#features">المميزات</a>
+    <a href="#gallery">المعرض</a>
+    <a href="#stats">أرقامنا</a>
+    <a href="#testimonials">آراء العملاء</a>
+  </nav>
+  <a href="#order" class="btn btn-gold nav-cta">اطلب الآن</a>
+  <button class="burger" id="burgerBtn" aria-label="القائمة"><span></span><span></span><span></span></button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#hero">الرئيسية</a>
+  <a href="#about">من نحن</a>
+  <a href="#features">المميزات</a>
+  <a href="#gallery">المعرض</a>
+  <a href="#stats">أرقامنا</a>
+  <a href="#testimonials">آراء العملاء</a>
+  <a href="#order" class="btn btn-gold" style="margin-top:10px;">اطلب الآن</a>
+</div>
+
+<!-- HERO -->
+<section id="hero" class="section-wrap">
+  <img src="images/sss.jpg.png" alt="فنجان قهوة وعود تحريك خشبي فاخر" class="bg-img" id="heroImg">
+  <div class="overlay"></div>
+  <div class="particles" id="particles"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="eyebrow" style="justify-content:flex-end;">صناعة جزائرية بمعايير عالمية</div>
+      <h1 class="reveal">تفاصيل صغيرة<br><span class="gold-text">فخامة لا تُضاهى</span></h1>
+      <p class="reveal">عيدان تحريك خشبية طبيعية 100%، مصنوعة بدقة حرفية لتُكمل كل رشفة قهوة بلمسة من الرقي والذوق الرفيع.</p>
+      <div class="hero-btns reveal">
+        <a href="#order" class="btn btn-gold">اطلب الآن</a>
+        <a href="#about" class="btn btn-ghost">اكتشف المزيد</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue"><span>مرر للأسفل</span><div class="line"></div></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="section-wrap">
+  <img src="images/photo N 2.png" alt="عيدان تحريك خشبية فاخرة عن قرب" class="bg-img">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="text-block align-right">
+      <div class="eyebrow" style="justify-content:flex-end;">من نحن</div>
+      <h2>لماذا <span class="gold-text">الفاخر الأوراس</span>؟</h2>
+      <p>نصنع عيدان التحريك من خشب طبيعي خالص، بتشطيب ناعم ودقيق يعكس فلسفتنا في الجودة قبل كل شيء. كل عود يمر بمراحل تصنيع احترافية تضمن متانة تدوم ولمسة أنيقة تليق بأرقى المقاهي والفنادق.</p>
+      <div class="trait-list">
+        <span class="trait-pill">خشب طبيعي</span>
+        <span class="trait-pill">تشطيب احترافي</span>
+        <span class="trait-pill">سطح ناعم</span>
+        <span class="trait-pill">متانة عالية</span>
+        <span class="trait-pill">جودة عالية</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="section-wrap">
+  <img src="images/photo N 3.png" alt="خلفية خشبية داكنة فاخرة" class="bg-img">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="features-head">
+      <div class="eyebrow" style="justify-content:center;">المميزات</div>
+      <h2>ما الذي يجعلنا <span class="gold-text">مختلفين</span></h2>
+    </div>
+    <div class="feature-grid" id="featureGrid">
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">خشب طبيعي 100%</span></div>
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">صديق للبيئة</span></div>
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">سطح ناعم</span></div>
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">مقاوم للكسر</span></div>
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">مناسب للمشروبات الساخنة</span></div>
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">آمن غذائياً</span></div>
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">خالٍ من المواد الكيميائية</span></div>
+      <div class="feature-card reveal-scale"><div class="icon">✓</div><span class="label">جودة تصنيع احترافية</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGING -->
+<section id="packaging" class="section-wrap">
+  <img src="images/photo N 4.png" alt="تغليف احترافي لعيدان التحريك" class="bg-img">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="text-block align-right">
+      <div class="eyebrow" style="justify-content:flex-end;">التغليف</div>
+      <h2>تغليف احترافي<br><span class="gold-text">يحافظ على الجودة</span></h2>
+      <p>نولي عناية فائقة لتغليف منتجاتنا بما يضمن حمايتها من التصنيع حتى وصولها إليك، بتصميم أنيق يعكس هوية العلامة الفاخرة.</p>
+      <div class="pack-list">
+        <div class="pack-item"><span class="dot"></span>تغليف احترافي محكم</div>
+        <div class="pack-item"><span class="dot"></span>تخزين نظيف ومرتب</div>
+        <div class="pack-item"><span class="dot"></span>سهولة في النقل</div>
+        <div class="pack-item"><span class="dot"></span>حماية كاملة للمنتج</div>
+        <div class="pack-item"><span class="dot"></span>عرض أنيق ومميز</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="section-wrap" style="min-height:auto;">
+  <div class="container">
+    <div class="gallery-head">
+      <div class="eyebrow" style="justify-content:center;">المعرض</div>
+      <h2>لمسة فنية في <span class="gold-text">كل تفصيل</span></h2>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item reveal-scale">
+        <img src="images/photo N 5.png" alt="صندوق عيدان تحريك فاخر">
+        <div class="gallery-caption"><h3>شكل خاص أنيق</h3><p>جاهز للتوزيع</p></div>
+      </div>
+      <div class="gallery-item reveal-scale">
+        <img src="images/photo N 6.png" alt="ترتيب فني لعيدان التحريك الخشبية">
+        <div class="gallery-caption"><h3>حرفية دقيقة</h3><p>تشطيب متقن</p></div>
+      </div>
+      <div class="gallery-item reveal-scale">
+        <img src="images/2fb2b5c4-c10b-406c-89f9-e34c30158e1b.png" alt="عود تحريك خشبي مع فنجان قهوة">
+        <div class="gallery-caption"><h3>شكل عادي متميز</h3><p>في إنتضار طلبكم </p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience" class="section-wrap">
+  <img src="images/photo N 8.png" alt="فنجان قهوة بخارية مع عود تحريك خشبي في مقهى فاخر" class="bg-img" style="filter:brightness(0.9);">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="text-block align-right">
+      <div class="eyebrow" style="justify-content:flex-end;">تجربة القهوة</div>
+      <h2>التفاصيل الصغيرة<br><span class="gold-text">تصنع الفرق</span></h2>
+      <p>عود واحد بسيط، لكنه يُكمل طقس القهوة بأكمله. في المقاهي، المطاعم والفنادق، تبقى اللمسة الأخيرة هي ما يُذكر.</p>
+      <p>نحن نصنع تلك اللمسة.</p>
+    </div>
+  </div>
+</section>
+
+<!-- STATISTICS -->
+<section id="stats" class="section-wrap">
+  <img src="images/photo N 9.png" alt="مستودع تخزين كراتين الفاخر الأوراس" class="bg-img">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="stats-panel">
+      <div class="eyebrow" style="justify-content:flex-end;">أرقامنا</div>
+      <h2>الجودة تُقاس <span class="gold-text">بالأرقام</span></h2>
+      <div class="stat-grid">
+        <div class="stat-item"><div class="stat-num"><span class="counter" data-target="6400">0</span></div><div class="stat-label">قطعة في الكرتون الواحد</div></div>
+        <div class="stat-item"><div class="stat-num"><span class="counter" data-target="100">0</span>%</div><div class="stat-label">خشب طبيعي خالص</div></div>
+        <div class="stat-item"><div class="stat-num"><span class="counter" data-target="1">0</span><sup style="font-size:16px;">#</sup></div><div class="stat-label">جودة تصنيع عالية</div></div>
+        <div class="stat-item"><div class="stat-num">24<span style="font-size:20px;">/7</span></div><div class="stat-label">جاهز للتوزيع الفوري</div></div>
+      </div>
+      <div class="suit-row">
+        <span class="suit-pill">☕ مقاهي</span>
+        <span class="suit-pill">🍽️ مطاعم</span>
+        <span class="suit-pill">🏨 فنادق</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ORDER -->
+<section id="order" class="section-wrap">
+  <img src="images/photo N 10.png" alt="طاولة فاخرة مع قهوة وعيدان تحريك خشبية" class="bg-img">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="order-wrap">
+      <div class="order-card reveal-scale">
+        <div class="order-head">
+          <div class="eyebrow" style="justify-content:center;">اطلب الآن</div>
+          <h2>أضف لمسة <span class="gold-text">الفخامة</span></h2>
+          <p>45,000 دج لكل كرتون — 6400 قطعة خشب طبيعي 100%</p>
+        </div>
+        <form id="orderForm">
+          <div class="form-grid">
+            <div class="field"><label>الاسم الكامل</label><input type="text" placeholder="مثال: أحمد بن علي" required></div>
+            <div class="field"><label>اسم الشركة</label><input type="text" placeholder="اسم المقهى / المطعم"></div>
+            <div class="field"><label>رقم الهاتف</label><input type="tel" placeholder="05XX XX XX XX" required></div>
+            <div class="field"><label>الولاية</label><input type="text" placeholder="مثال: باتنة" required></div>
+            <div class="field full"><label>المدينة</label><input type="text" placeholder="مثال: باتنة المدينة"></div>
+            <div class="field full">
+              <label>عدد الكراتين</label>
+              <div class="qty-row">
+                <button type="button" class="qty-btn" id="qtyMinus">−</button>
+                <span class="qty-num" id="qtyNum">2</span>
+                <button type="button" class="qty-btn" id="qtyPlus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="price-summary">
+            <div>
+              <span class="lbl">السعر الإجمالي</span>
+              <span class="unit">45,000 دج × <span id="qtyEcho">2</span> كرتون</span>
+            </div>
+            <div class="total gold-text" id="totalPrice">900,000 دج</div>
+          </div>
+          <button type="submit" class="btn btn-gold submit-btn">إرسال الطلب</button>
+          <p class="form-note">سيتم التواصل معكم لتأكيد الطلب وترتيب التوصيل</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="section-wrap">
+  <img src="images/photo N 11.png" alt="داخل مقهى فاخر" class="bg-img">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="test-head">
+      <div class="eyebrow" style="justify-content:center;">آراء العملاء</div>
+      <h2>ثقة عملائنا <span class="gold-text">شرف لنا</span></h2>
+    </div>
+    <div class="test-grid">
+      <div class="test-card reveal-scale">
+        <div class="stars">★★★★★</div>
+        <p class="quote">"جودة عالية ولمسة فاخرة حقيقية. عملاؤنا لاحظوا الفرق من أول استخدام."</p>
+        <div class="test-person"><div class="test-name"><div class="n">سفيان بلقاسم</div><div class="r">صاحب مقهى</div></div><div class="test-avatar">س</div></div>
+      </div>
+      <div class="test-card reveal-scale">
+        <div class="stars">★★★★★</div>
+        <p class="quote">"التغليف احترافي والتسليم في الوقت المحدد. شريك موثوق لمطعمنا."</p>
+        <div class="test-person"><div class="test-name"><div class="n">أمينة زروقي</div><div class="r">مديرة مطعم</div></div><div class="test-avatar">أ</div></div>
+      </div>
+      <div class="test-card reveal-scale">
+        <div class="stars">★★★★★</div>
+        <p class="quote">"أفضل حل لتجنب الأمراض الناتجة عن الملاعق البلاستيكية"</p>
+        <div class="test-person"><div class="test-name"><div class="n">كريم مرزوقي</div><div class="r">مدير فندق</div></div><div class="test-avatar">ك</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <img src="images/photo N 9.png" alt="خلفية خشبية داكنة فاخرة مع لمسات ذهبية" class="bg-img">
+  <div class="overlay"></div>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="images/lobo.png" alt="شعار الفاخر الأوراس" class="footer-logo-img">
+      <div class="name gold-text">الفاخر الأوراس</div>
+    </div>
+    <p class="footer-tag">خشب طبيعي. حرفية فاخرة. تفاصيل لا تُنسى.</p>
+    <div class="footer-links">
+      <a href="#hero">الرئيسية</a>
+      <a href="#about">من نحن</a>
+      <a href="#features">المميزات</a>
+      <a href="#gallery">المعرض</a>
+      <a href="#order">اطلب الآن</a>
+    </div>
+    <div class="footer-contact">
+      <span>📞 0778188638</span>
+      <span>✉️ contact@elfakhirauras.dz</span>
+      <span>📍 باتنة، الجزائر</span>
+    </div>
+    <div class="social-row">
+      <a href="#" aria-label="انستغرام">IG</a>
+      <a href="#" aria-label="فيسبوك">FB</a>
+      <a href="#" aria-label="واتساب">WA</a>
+    </div>
+    <div class="footer-bottom">© 2026 الفاخر الأوراس. جميع الحقوق محفوظة.</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+  /* ---- HEADER SCROLL STATE ---- */
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 60){ header.classList.add('scrolled'); } else { header.classList.remove('scrolled'); }
+  });
+
+  /* ---- MOBILE MENU ---- */
+  const burger = document.getElementById('burgerBtn');
+  const mmenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', function(){
+    burger.classList.toggle('open');
+    mmenu.classList.toggle('open');
+  });
+  mmenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    burger.classList.remove('open'); mmenu.classList.remove('open');
+  }));
+
+  /* ---- STIR PROGRESS ---- */
+  const stirFill = document.getElementById('stirFill');
+  const stirStick = document.createElement('div');
+  stirStick.className = 'stick';
+  document.getElementById('stir-progress').appendChild(stirStick);
+  stirStick.innerHTML = '<svg viewBox="0 0 13 34" width="13" height="34" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 0C6.5 0 5 10 5 13.5C5 15.7 5.6 17.2 6.5 18.5C7.4 17.2 8 15.7 8 13.5C8 10 6.5 0 6.5 0Z" fill="#F0DBA0"/></svg>';
+  window.addEventListener('scroll', function(){
+    const h = document.documentElement;
+    const pct = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    stirFill.style.height = pct + '%';
+    stirStick.style.bottom = pct + '%';
+  });
+
+  /* ---- PARTICLES ---- */
+  const particleWrap = document.getElementById('particles');
+  for(let i=0;i<26;i++){
+    const s = document.createElement('span');
+    s.style.right = Math.random()*100+'%';
+    s.style.animationDuration = (8+Math.random()*10)+'s';
+    s.style.animationDelay = (Math.random()*10)+'s';
+    s.style.width = s.style.height = (2+Math.random()*2)+'px';
+    particleWrap.appendChild(s);
+  }
+
+  /* ---- GSAP REVEALS ---- */
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero entrance
+  gsap.timeline({defaults:{ease:'power3.out'}})
+    .to('#hero .eyebrow', {opacity:1, y:0, duration:.8}, .2)
+    .fromTo('#hero h1', {opacity:0,y:40}, {opacity:1,y:0,duration:1}, .35)
+    .fromTo('#hero .hero-content p', {opacity:0,y:30}, {opacity:1,y:0,duration:.9}, .55)
+    .fromTo('#hero .hero-btns', {opacity:0,y:30}, {opacity:1,y:0,duration:.9}, .7);
+  gsap.set('#hero .eyebrow', {opacity:0, y:20});
+
+  gsap.fromTo('#heroImg', {scale:1.15}, {scale:1, duration:2.2, ease:'power2.out'});
+
+  // Generic reveals
+  document.querySelectorAll('.reveal').forEach(el => {
+    if(el.closest('#hero')) return;
+    gsap.fromTo(el, {opacity:0,y:40}, {
+      opacity:1,y:0,duration:1,ease:'power3.out',
+      scrollTrigger:{trigger:el, start:'top 85%'}
+    });
+  });
+
+  document.querySelectorAll('.reveal-scale').forEach((el,i) => {
+    gsap.fromTo(el, {opacity:0,scale:0.92,y:20}, {
+      opacity:1,scale:1,y:0,duration:.8,ease:'power3.out',delay:(i%4)*0.08,
+      scrollTrigger:{trigger:el, start:'top 88%'}
+    });
+  });
+
+  // Section headings/text blocks
+  document.querySelectorAll('.text-block, .features-head, .gallery-head, .test-head, .order-head').forEach(el => {
+    gsap.fromTo(el, {opacity:0,y:36}, {
+      opacity:1,y:0,duration:1,ease:'power3.out',
+      scrollTrigger:{trigger:el, start:'top 85%'}
+    });
+  });
+
+  // Background parallax
+  document.querySelectorAll('.bg-img').forEach(img => {
+    gsap.to(img, {
+      yPercent:12, ease:'none',
+      scrollTrigger:{trigger:img.closest('section, header, footer'), start:'top bottom', end:'bottom top', scrub:true}
+    });
+  });
+
+  /* ---- COUNTERS ---- */
+  document.querySelectorAll('.counter').forEach(counter => {
+    const target = parseInt(counter.getAttribute('data-target'), 10);
+    ScrollTrigger.create({
+      trigger: counter,
+      start: 'top 90%',
+      once: true,
+      onEnter: () => {
+        gsap.fromTo(counter, {innerText:0}, {
+          innerText: target,
+          duration: 2,
+          ease:'power2.out',
+          snap:{innerText:1},
+          onUpdate: function(){ counter.innerText = Math.floor(counter.innerText).toLocaleString('en-US'); }
+        });
+      }
+    });
+  });
+
+  /* ---- ORDER FORM PRICE CALC ---- */
+  const PRICE = 45000;
+  let qty = 2;
+  const qtyNum = document.getElementById('qtyNum');
+  const qtyEcho = document.getElementById('qtyEcho');
+  const totalPrice = document.getElementById('totalPrice');
+  function updateTotal(){
+    qtyNum.textContent = qty;
+    qtyEcho.textContent = qty;
+    totalPrice.textContent = (qty*PRICE).toLocaleString('en-US') + ' دج';
+  }
+  document.getElementById('qtyPlus').addEventListener('click', function(){ qty++; updateTotal(); });
+  document.getElementById('qtyMinus').addEventListener('click', function(){ if(qty>1){qty--; updateTotal();} });
+
+  document.getElementById('orderForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const form = e.target;
+
+    /* الحقول النصية بترتيب ظهورها في النموذج: الاسم، الشركة، الهاتف، الولاية، المدينة */
+    const textInputs = form.querySelectorAll('.field input[type="text"], .field input[type="tel"]');
+    const fullName   = textInputs[0] ? textInputs[0].value.trim() : '';
+    const company    = textInputs[1] ? textInputs[1].value.trim() : '';
+    const phone      = textInputs[2] ? textInputs[2].value.trim() : '';
+    const wilaya     = textInputs[3] ? textInputs[3].value.trim() : '';
+    const city       = textInputs[4] ? textInputs[4].value.trim() : '';
+    const cartons    = qtyNum ? qtyNum.textContent.trim() : '';
+    const totalAmount= totalPrice ? totalPrice.textContent.trim() : '';
+
+    /* التحقق من اكتمال الحقول المطلوبة (required) */
+    let firstInvalid = null;
+    form.querySelectorAll('.field input[required]').forEach(function(input){
+      if(!input.value.trim() && !firstInvalid){ firstInvalid = input; }
+    });
+    if(firstInvalid){
+      firstInvalid.focus();
+      firstInvalid.style.borderColor = '#e0745c';
+      setTimeout(() => { firstInvalid.style.borderColor = ''; }, 2000);
+      return;
+    }
+
+    const btn = form.querySelector('.submit-btn');
+    const original = btn.textContent;
+    btn.textContent = 'تم إرسال الطلب بنجاح ✓';
+    setTimeout(() => { btn.textContent = original; }, 3000);
+
+    const message =
+      '📦 طلب جديد من موقع EL-FAKHIR AURAS\n\n' +
+      '👤 الاسم:\n' + fullName + '\n\n' +
+      '🏢 اسم الشركة:\n' + (company || '—') + '\n\n' +
+      '📞 رقم الهاتف:\n' + phone + '\n\n' +
+      '📍 الولاية:\n' + wilaya + '\n\n' +
+      '🏙️ المدينة:\n' + (city || '—') + '\n\n' +
+      '📦 عدد الكراتين:\n' + cartons + '\n\n' +
+      '💰 السعر الإجمالي:\n' + totalAmount + '\n\n' +
+      '🌐 تم إرسال الطلب من الموقع الإلكتروني.';
+
+    const whatsappNumber = '213778188638';
+    const whatsappURL = 'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(message);
+    window.open(whatsappURL, '_blank');
+  });
+
+  /* ---- SMOOTH NAV LINKS OFFSET ---- */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e){
+      const id = this.getAttribute('href');
+      if(id.length>1){
+        const target = document.querySelector(id);
+        if(target){
+          e.preventDefault();
+          window.scrollTo({top: target.offsetTop - 0, behavior:'smooth'});
+        }
+      }
+    });
+  });
+
+});
+</script>
+</body>
+</html>
