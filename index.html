@@ -608,6 +608,8 @@
     transition:transform .5s var(--ease); box-shadow:0 12px 30px -10px rgba(0,0,0,.6);
   }
   .success-toast.show{transform:translateX(-50%) translateY(0);}
+  .success-toast.error{border-color:rgba(190,72,72,.85); color:rgba(255,205,205,.95);}
+  .img-failed{background:rgba(24,17,10,.72); min-height:120px;}
 
   /* ---------- TESTIMONIALS ---------- */
   .test-wrap{position:relative;}
@@ -694,8 +696,9 @@
     .reveal, .stagger > *{opacity:1; transform:none;}
   }
 </style>
+<noscript><style>.splash{display:none;} body{padding-bottom:0;}</style></noscript>
 </head>
-<body class="locked">
+<body>
 
 <div class="splash" id="splash">
   <img class="splash-logo" src="images/logo.png" alt="الفاخر الأوراس">
@@ -976,73 +979,150 @@
 <div class="success-toast" id="toast">✓ تم استلام طلبكم بنجاح</div>
 
 <script>
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function(){
+  'use strict';
 
-  /* ---- splash intro ---- */
-  const splash = document.getElementById('splash');
-  function endSplash(){
-    if(splash.classList.contains('hide')) return;
-    splash.classList.add('hide');
+  /* ---- failure reporting ----
+     Every feature below is initialised in isolation so that a single broken
+     feature (missing element, unsupported API) can never take the rest of the
+     page down with it. */
+  function report(scope, err){
+    if(window.console && console.error) console.error('[el-fakhir] ' + scope + ': ', err);
+  }
+  function init(scope, fn){
+    try{ fn(); }
+    catch(err){ report(scope, err); }
+  }
+  function need(id){
+    const el = document.getElementById(id);
+    if(!el) throw new Error('required element #' + id + ' is missing');
+    return el;
+  }
+
+  const reducedMotion = window.matchMedia
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+  const hasObserver = typeof IntersectionObserver === 'function';
+
+  /* ---- splash intro ----
+     The page starts locked behind the splash, so releasing it must survive any
+     failure: revealPage() is safe to call repeatedly and from error handlers. */
+  function revealPage(){
+    const splash = document.getElementById('splash');
+    if(splash) splash.classList.add('hide');
     document.body.classList.remove('locked');
   }
-  setTimeout(endSplash, reducedMotion ? 200 : 1650);
-  splash.addEventListener('click', endSplash);
+  document.body.classList.add('locked');
+  setTimeout(revealPage, reducedMotion ? 200 : 1650);
+  init('splash', ()=>{
+    need('splash').addEventListener('click', revealPage);
+  });
+
+  /* A script error must never leave the visitor stuck on the splash screen. */
+  window.addEventListener('error', (e)=>{
+    report('uncaught error', e.error || e.message);
+    revealPage();
+  });
+  window.addEventListener('unhandledrejection', (e)=>{
+    report('unhandled rejection', e.reason);
+    revealPage();
+  });
+
+  /* ---- toast notifications ---- */
+  let toastTimer;
+  function showToast(text, isError){
+    const toast = document.getElementById('toast');
+    if(!toast){
+      if(isError) window.alert(text);
+      return;
+    }
+    toast.textContent = text;
+    toast.classList.toggle('error', !!isError);
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toast.classList.remove('show'), isError ? 5000 : 2600);
+  }
 
   /* ---- top reading progress bar ---- */
-  const progressFill = document.getElementById('progressFill');
-  function updateProgressBar(){
-    const h = document.documentElement;
-    const scrollable = h.scrollHeight - h.clientHeight;
-    const pct = scrollable > 0 ? (h.scrollTop / scrollable) * 100 : 0;
-    progressFill.style.width = pct + '%';
-  }
-  window.addEventListener('scroll', updateProgressBar, {passive:true});
-  updateProgressBar();
+  init('progress bar', ()=>{
+    const progressFill = need('progressFill');
+    function updateProgressBar(){
+      const h = document.documentElement;
+      const scrollable = h.scrollHeight - h.clientHeight;
+      const pct = scrollable > 0 ? (h.scrollTop / scrollable) * 100 : 0;
+      progressFill.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgressBar, {passive:true});
+    updateProgressBar();
+  });
 
   /* ---- header scroll state ---- */
-  const header = document.getElementById('siteHeader');
-  const stickyBar = document.getElementById('stickyBar');
-  const heroEl = document.getElementById('hero');
-
-  const heroObserver = new IntersectionObserver(([entry])=>{
-    header.classList.toggle('scrolled', !entry.isIntersecting);
-    stickyBar.classList.toggle('visible', !entry.isIntersecting);
-  }, {threshold:0.15});
-  heroObserver.observe(heroEl);
+  init('header scroll state', ()=>{
+    const header = need('siteHeader');
+    const stickyBar = need('stickyBar');
+    const heroEl = need('hero');
+    if(!hasObserver){
+      /* Without IntersectionObserver the sticky bar would never appear at all,
+         so fall back to a scroll listener instead of failing silently. */
+      const onScroll = ()=>{
+        const past = window.scrollY > window.innerHeight * 0.85;
+        header.classList.toggle('scrolled', past);
+        stickyBar.classList.toggle('visible', past);
+      };
+      window.addEventListener('scroll', onScroll, {passive:true});
+      onScroll();
+      return;
+    }
+    const heroObserver = new IntersectionObserver(([entry])=>{
+      header.classList.toggle('scrolled', !entry.isIntersecting);
+      stickyBar.classList.toggle('visible', !entry.isIntersecting);
+    }, {threshold:0.15});
+    heroObserver.observe(heroEl);
+  });
 
   /* ---- menu toggle ---- */
-  const menuBtn = document.getElementById('menuBtn');
-  const nav = document.getElementById('nav');
-  const overlay = document.getElementById('overlay');
-  function closeMenu(){
-    menuBtn.classList.remove('open');
-    nav.classList.remove('open');
-    overlay.classList.remove('open');
-  }
-  menuBtn.addEventListener('click', ()=>{
-    menuBtn.classList.toggle('open');
-    nav.classList.toggle('open');
-    overlay.classList.toggle('open');
+  init('menu', ()=>{
+    const menuBtn = need('menuBtn');
+    const nav = need('nav');
+    const overlay = need('overlay');
+    function closeMenu(){
+      menuBtn.classList.remove('open');
+      nav.classList.remove('open');
+      overlay.classList.remove('open');
+    }
+    menuBtn.addEventListener('click', ()=>{
+      menuBtn.classList.toggle('open');
+      nav.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+    overlay.addEventListener('click', closeMenu);
+    document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click', closeMenu));
   });
-  overlay.addEventListener('click', closeMenu);
-  document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click', closeMenu));
 
   /* ---- scroll reveal ---- */
-  const revealEls = document.querySelectorAll('.reveal, .stagger, .stir-divider');
-  const revealObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('in-view');
-        entry.target.classList.add('drawn');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, {threshold:0.18, rootMargin:'0px 0px -40px 0px'});
-  revealEls.forEach(el=>revealObserver.observe(el));
+  init('scroll reveal', ()=>{
+    const revealEls = document.querySelectorAll('.reveal, .stagger, .stir-divider');
+    if(!hasObserver){
+      /* Reveal everything rather than leaving the content invisible forever. */
+      revealEls.forEach(el=>el.classList.add('in-view', 'drawn'));
+      return;
+    }
+    const revealObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          entry.target.classList.add('drawn');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.18, rootMargin:'0px 0px -40px 0px'});
+    revealEls.forEach(el=>revealObserver.observe(el));
+  });
 
   /* ---- hero parallax ---- */
-  const heroMedia = document.getElementById('heroMedia');
-  if(!reducedMotion){
+  init('hero parallax', ()=>{
+    if(reducedMotion) return;
+    const heroMedia = need('heroMedia');
     let ticking = false;
     window.addEventListener('scroll', ()=>{
       if(!ticking){
@@ -1056,15 +1136,18 @@
         ticking = true;
       }
     }, {passive:true});
-  }
+  });
 
   /* ---- ambient background parallax across sections ---- */
-  const bgParallaxImgs = document.querySelectorAll('.features-bg img, .stats-bg img, .order-bg img, .test-bg img');
-  if(!reducedMotion && bgParallaxImgs.length){
+  init('background parallax', ()=>{
+    const bgParallaxImgs = document.querySelectorAll('.features-bg img, .stats-bg img, .order-bg img, .test-bg img');
+    if(reducedMotion || !bgParallaxImgs.length) return;
     let bgTicking = false;
     function updateBgParallax(){
       bgParallaxImgs.forEach(img=>{
-        const rect = img.parentElement.getBoundingClientRect();
+        const parent = img.parentElement;
+        if(!parent) return;
+        const rect = parent.getBoundingClientRect();
         const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
         const shift = (Math.min(1, Math.max(0, progress)) - 0.5) * 60;
         img.style.transform = `translateY(${shift}px)`;
@@ -1077,206 +1160,254 @@
       }
     }, {passive:true});
     updateBgParallax();
-  }
+  });
 
-  /* ---- gallery premium 3D carousel ---- */
-  const galleryScroll = document.getElementById('galleryScroll');
-  const gCards = [...galleryScroll.children];
-  const galleryBar = document.getElementById('galleryBar');
-  const galleryCountStart = document.getElementById('galleryCountStart');
-  function pad(n){ return String(n).padStart(2,'0'); }
-  function updateGallery(){
-    const center = galleryScroll.scrollLeft + galleryScroll.clientWidth/2;
-    let closestIdx = 0, closestDist = Infinity;
-    gCards.forEach((card,i)=>{
-      const cardCenter = card.offsetLeft + card.offsetWidth/2;
-      const dist = cardCenter - center;
-      const absDist = Math.abs(dist);
-      if(absDist < closestDist){closestDist = absDist; closestIdx = i;}
-      card.classList.toggle('active', absDist < card.offsetWidth/2);
-      if(!reducedMotion){
-        const norm = Math.max(-1, Math.min(1, dist / card.offsetWidth));
-        const rotateY = norm * -18;
-        const scale = absDist < card.offsetWidth/2 ? 1 : 0.9;
-        card.style.transform = `scale(${scale}) translateY(${absDist<card.offsetWidth/2?0:6}px) rotateY(${rotateY}deg)`;
-      }
+  /* ---- gallery premium 3D carousel + drag ---- */
+  init('gallery', ()=>{
+    const galleryScroll = need('galleryScroll');
+    const gCards = [...galleryScroll.children];
+    const galleryBar = need('galleryBar');
+    const galleryCountStart = need('galleryCountStart');
+    if(!gCards.length) throw new Error('gallery has no cards');
+    function pad(n){ return String(n).padStart(2,'0'); }
+    function updateGallery(){
+      const center = galleryScroll.scrollLeft + galleryScroll.clientWidth/2;
+      let closestIdx = 0, closestDist = Infinity;
+      gCards.forEach((card,i)=>{
+        const cardCenter = card.offsetLeft + card.offsetWidth/2;
+        const dist = cardCenter - center;
+        const absDist = Math.abs(dist);
+        if(absDist < closestDist){closestDist = absDist; closestIdx = i;}
+        card.classList.toggle('active', absDist < card.offsetWidth/2);
+        if(!reducedMotion){
+          const norm = Math.max(-1, Math.min(1, dist / card.offsetWidth));
+          const rotateY = norm * -18;
+          const scale = absDist < card.offsetWidth/2 ? 1 : 0.9;
+          card.style.transform = `scale(${scale}) translateY(${absDist<card.offsetWidth/2?0:6}px) rotateY(${rotateY}deg)`;
+        }
+      });
+      galleryBar.style.width = (((closestIdx+1)/gCards.length)*100) + '%';
+      galleryCountStart.textContent = pad(closestIdx+1);
+    }
+    galleryScroll.addEventListener('scroll', updateGallery, {passive:true});
+    updateGallery();
+
+    let isDragging = false, dragStartX = 0, dragScrollLeft = 0;
+    galleryScroll.addEventListener('pointerdown', (e)=>{
+      if(e.pointerType === 'mouse' && e.button !== 0) return;
+      isDragging = true; dragStartX = e.clientX; dragScrollLeft = galleryScroll.scrollLeft;
+      galleryScroll.classList.add('dragging');
+      galleryScroll.setPointerCapture?.(e.pointerId);
     });
-    galleryBar.style.width = (((closestIdx+1)/gCards.length)*100) + '%';
-    galleryCountStart.textContent = pad(closestIdx+1);
-  }
-  galleryScroll.addEventListener('scroll', updateGallery, {passive:true});
-  updateGallery();
-
-  /* ---- mouse/touch drag gallery ---- */
-  let isDragging = false, dragStartX = 0, dragScrollLeft = 0, dragMoved = false;
-  galleryScroll.addEventListener('pointerdown', (e)=>{
-    if(e.pointerType === 'mouse' && e.button !== 0) return;
-    isDragging = true; dragMoved = false; dragStartX = e.clientX; dragScrollLeft = galleryScroll.scrollLeft;
-    galleryScroll.classList.add('dragging'); galleryScroll.setPointerCapture?.(e.pointerId);
+    galleryScroll.addEventListener('pointermove', (e)=>{
+      if(!isDragging) return;
+      galleryScroll.scrollLeft = dragScrollLeft - (e.clientX - dragStartX) * 1.15;
+    });
+    const endGalleryDrag = (e)=>{
+      if(!isDragging) return;
+      isDragging = false;
+      galleryScroll.classList.remove('dragging');
+      if(galleryScroll.hasPointerCapture?.(e.pointerId)){
+        galleryScroll.releasePointerCapture(e.pointerId);
+      }
+    };
+    galleryScroll.addEventListener('pointerup', endGalleryDrag);
+    galleryScroll.addEventListener('pointercancel', endGalleryDrag);
+    galleryScroll.addEventListener('pointerleave', (e)=>{ if(e.pointerType === 'mouse') endGalleryDrag(e); });
   });
-  galleryScroll.addEventListener('pointermove', (e)=>{
-    if(!isDragging) return;
-    const dx = e.clientX - dragStartX;
-    if(Math.abs(dx) > 5) dragMoved = true;
-    galleryScroll.scrollLeft = dragScrollLeft - dx * 1.15;
-  });
-  const endGalleryDrag = (e)=>{
-    if(!isDragging) return;
-    isDragging = false; galleryScroll.classList.remove('dragging');
-    try{ galleryScroll.releasePointerCapture?.(e.pointerId); }catch(_){}
-  };
-  galleryScroll.addEventListener('pointerup', endGalleryDrag);
-  galleryScroll.addEventListener('pointercancel', endGalleryDrag);
-  galleryScroll.addEventListener('pointerleave', (e)=>{ if(e.pointerType === 'mouse') endGalleryDrag(e); });
 
   /* ---- animated counters ---- */
-  const nums = document.querySelectorAll('.num');
-  const counterObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
+  init('counters', ()=>{
+    const nums = document.querySelectorAll('.num');
+    function renderFinal(el){
+      const target = parseInt(el.dataset.count, 10);
+      if(Number.isFinite(target)){
+        el.textContent = target.toLocaleString('en-US') + (el.dataset.suffix || '');
+      }
+    }
+    if(!hasObserver){
+      nums.forEach(renderFinal);
+      return;
+    }
+    const counterObserver = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
         const el = entry.target;
+        counterObserver.unobserve(el);
         const card = el.closest('.stat-card');
         const target = parseInt(el.dataset.count, 10);
         const suffix = el.dataset.suffix || '';
+        if(!Number.isFinite(target)){
+          report('counters', new Error('invalid data-count "' + el.dataset.count + '"'));
+          return;
+        }
         const duration = 1400;
         const start = performance.now();
         function easeOutExpo(t){ return t===1 ? 1 : 1 - Math.pow(2, -10*t); }
         function tick(now){
           const p = Math.min(1, (now - start)/duration);
-          const eased = easeOutExpo(p);
-          el.textContent = Math.round(target*eased).toLocaleString('en-US') + suffix;
+          el.textContent = Math.round(target*easeOutExpo(p)).toLocaleString('en-US') + suffix;
           if(p < 1){ requestAnimationFrame(tick); }
-          else { card.classList.add('pulse'); setTimeout(()=>card.classList.remove('pulse'), 500); }
+          else if(card){
+            card.classList.add('pulse');
+            setTimeout(()=>card.classList.remove('pulse'), 500);
+          }
         }
         requestAnimationFrame(tick);
-        counterObserver.unobserve(el);
+      });
+    }, {threshold:0.5});
+    nums.forEach(n=>counterObserver.observe(n));
+  });
+
+  /* ---- order form: qty, total and WhatsApp hand-off ---- */
+  init('order form', ()=>{
+    const form = need('orderForm');
+    const unitPrice = 45000;
+    const defaultQty = 2;
+    let qty = defaultQty;
+    const qtyVal = need('qtyVal');
+    const totalLabel = need('totalLabel');
+    const totalVal = need('totalVal');
+    const stickyTotal = need('stickyTotal');
+    const fmt = (n)=>n.toLocaleString('en-US');
+    function updateTotal(bump){
+      qtyVal.textContent = qty;
+      if(bump){ qtyVal.classList.remove('bump'); void qtyVal.offsetWidth; qtyVal.classList.add('bump'); }
+      const total = unitPrice * qty;
+      totalLabel.textContent = `السعر الإجمالي ${fmt(unitPrice)} دج × ${qty} كرتون`;
+      totalVal.textContent = `${fmt(total)} دج`;
+      stickyTotal.textContent = `${fmt(total)} دج`;
+      totalVal.classList.remove('flash'); void totalVal.offsetWidth; totalVal.classList.add('flash');
+    }
+    need('plusBtn').addEventListener('click', ()=>{ qty++; updateTotal(true); });
+    need('minusBtn').addEventListener('click', ()=>{ if(qty>1){ qty--; updateTotal(true); } });
+    updateTotal(false);
+
+    const FIELDS = [
+      {id:'f-name', label:'الاسم الكامل', required:true},
+      {id:'f-company', label:'اسم الشركة', required:false},
+      {id:'f-phone', label:'رقم الهاتف', required:true},
+      {id:'f-state', label:'الولاية', required:true},
+      {id:'f-city', label:'المدينة', required:true}
+    ];
+    const WHATSAPP_NUMBER = '213778188638';
+
+    /* A single submit handler owns the whole flow: the order details are read
+       and handed off first, and the form is only cleared and confirmed once the
+       hand-off actually happened. */
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      try{
+        if(typeof form.reportValidity === 'function' && !form.reportValidity()) return;
+
+        const values = {};
+        const missing = [];
+        FIELDS.forEach(field=>{
+          const el = document.getElementById(field.id);
+          const value = el ? el.value.trim() : '';
+          values[field.id] = value;
+          if(field.required && !value) missing.push(field.label);
+        });
+        if(missing.length){
+          showToast('يرجى إكمال الحقول التالية: ' + missing.join('، '), true);
+          return;
+        }
+
+        const total = unitPrice * qty;
+        const message =
+`مرحباً، أريد تسجيل طلب جديد من موقع الفاخر الأوراس:
+
+الاسم الكامل: ${values['f-name']}
+اسم الشركة: ${values['f-company'] || '-'}
+رقم الهاتف: ${values['f-phone']}
+الولاية: ${values['f-state']}
+المدينة: ${values['f-city']}
+عدد الكراتين: ${qty}
+السعر الإجمالي: ${fmt(total)} دج`;
+        const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
+
+        const win = window.open(url, '_blank');
+        if(!win){
+          /* Popup blocked: navigate in the current tab instead of pretending
+             the order went through. */
+          window.location.href = url;
+          return;
+        }
+
+        showToast('✓ تم استلام طلبكم بنجاح', false);
+        form.reset();
+        qty = defaultQty;
+        updateTotal(false);
+      }catch(err){
+        report('order submit', err);
+        showToast('تعذّر إرسال الطلب، يرجى الاتصال بنا مباشرة على ' + WHATSAPP_NUMBER, true);
       }
-    });
-  }, {threshold:0.5});
-  nums.forEach(n=>counterObserver.observe(n));
-
-  /* ---- order form: qty + total ---- */
-  const unitPrice = 45000;
-  let qty = 2;
-  const qtyVal = document.getElementById('qtyVal');
-  const totalLabel = document.getElementById('totalLabel');
-  const totalVal = document.getElementById('totalVal');
-  const stickyTotal = document.getElementById('stickyTotal');
-  function fmt(n){ return n.toLocaleString('en-US'); }
-  function updateTotal(bump){
-    qtyVal.textContent = qty;
-    if(bump){ qtyVal.classList.remove('bump'); void qtyVal.offsetWidth; qtyVal.classList.add('bump'); }
-    const total = unitPrice * qty;
-    totalLabel.textContent = `السعر الإجمالي ${fmt(unitPrice)} دج × ${qty} كرتون`;
-    totalVal.textContent = `${fmt(total)} دج`;
-    stickyTotal.textContent = `${fmt(total)} دج`;
-    totalVal.classList.remove('flash'); void totalVal.offsetWidth; totalVal.classList.add('flash');
-  }
-  document.getElementById('plusBtn').addEventListener('click', ()=>{ qty++; updateTotal(true); });
-  document.getElementById('minusBtn').addEventListener('click', ()=>{ if(qty>1){ qty--; updateTotal(true); } });
-  updateTotal(false);
-
-  /* ---- button ripple ---- */
-  document.querySelectorAll('.rippleable').forEach(btn=>{
-    btn.addEventListener('click', function(e){
-      const rect = this.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      const size = Math.max(rect.width, rect.height);
-      ripple.className = 'ripple';
-      ripple.style.width = ripple.style.height = size + 'px';
-      const cx = (e.clientX ?? rect.left+rect.width/2) - rect.left - size/2;
-      const cy = (e.clientY ?? rect.top+rect.height/2) - rect.top - size/2;
-      ripple.style.left = cx + 'px';
-      ripple.style.top = cy + 'px';
-      this.appendChild(ripple);
-      setTimeout(()=>ripple.remove(), 650);
     });
   });
 
-  /* ---- form submit ---- */
-  const toast = document.getElementById('toast');
-  document.getElementById('orderForm').addEventListener('submit', (e)=>{
-    e.preventDefault();
-    toast.classList.add('show');
-    setTimeout(()=>toast.classList.remove('show'), 2600);
-    e.target.reset();
-    qty = 2; updateTotal(false);
+  /* ---- button ripple ---- */
+  init('ripple', ()=>{
+    document.querySelectorAll('.rippleable').forEach(btn=>{
+      btn.addEventListener('click', function(e){
+        const rect = this.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        const size = Math.max(rect.width, rect.height);
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = size + 'px';
+        const cx = (e.clientX ?? rect.left+rect.width/2) - rect.left - size/2;
+        const cy = (e.clientY ?? rect.top+rect.height/2) - rect.top - size/2;
+        ripple.style.left = cx + 'px';
+        ripple.style.top = cy + 'px';
+        this.appendChild(ripple);
+        setTimeout(()=>ripple.remove(), 650);
+      });
+    });
   });
 
   /* ---- testimonials autoplay ---- */
-  const testScroll = document.getElementById('testScroll');
-  const tCards = [...testScroll.children];
-  const progressBar = document.getElementById('testProgressBar');
-  let tIndex = 0, tTimer, pTimer;
-  const AUTO_DELAY = 4200;
-  function goToTestimonial(i){
-    tIndex = (i + tCards.length) % tCards.length;
-    const card = tCards[tIndex];
-    // scroll only the horizontal testimonial track itself — never the page.
-    const targetLeft = card.offsetLeft - (testScroll.clientWidth - card.offsetWidth) / 2;
-    testScroll.scrollTo({left: targetLeft, behavior: reducedMotion ? 'auto' : 'smooth'});
-  }
-  function startAutoplay(){
-    if(reducedMotion) return;
-    clearInterval(tTimer); clearInterval(pTimer);
-    let start = performance.now();
-    pTimer = setInterval(()=>{
-      const p = Math.min(100, ((performance.now()-start)/AUTO_DELAY)*100);
-      progressBar.style.width = p + '%';
-    }, 60);
-    tTimer = setInterval(()=>{
-      goToTestimonial(tIndex+1);
-      start = performance.now();
-    }, AUTO_DELAY);
-  }
-  function stopAutoplay(){ clearInterval(tTimer); clearInterval(pTimer); }
-  testScroll.addEventListener('touchstart', stopAutoplay, {passive:true});
-  testScroll.addEventListener('touchend', ()=>setTimeout(startAutoplay, 3000), {passive:true});
-  startAutoplay();
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('orderForm');
-  if (!form) return;
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const get = id => {
-      const el = document.getElementById(id);
-      return el ? el.value.trim() : '';
-    };
-
-    const name = get('f-name');
-    const company = get('f-company');
-    const phone = get('f-phone');
-    const state = get('f-state');
-    const city = get('f-city');
-    const qtyEl = document.getElementById('qtyVal');
-    const totalEl = document.getElementById('totalVal');
-
-    const qty = qtyEl ? qtyEl.textContent.trim() : '2';
-    const total = totalEl ? totalEl.textContent.trim() : '';
-
-    const message =
-`مرحباً، أريد تسجيل طلب جديد من موقع الفاخر الأوراس:
-
-الاسم الكامل: ${name}
-اسم الشركة: ${company || '-'}
-رقم الهاتف: ${phone}
-الولاية: ${state}
-المدينة: ${city}
-عدد الكراتين: ${qty}
-السعر الإجمالي: ${total}`;
-
-    const whatsappNumber = '213778188638';
-    window.open(
-      'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(message),
-      '_blank'
-    );
+  init('testimonials', ()=>{
+    const testScroll = need('testScroll');
+    const tCards = [...testScroll.children];
+    const progressBar = need('testProgressBar');
+    if(!tCards.length) throw new Error('testimonials track has no cards');
+    let tIndex = 0, tTimer, pTimer;
+    const AUTO_DELAY = 4200;
+    function goToTestimonial(i){
+      tIndex = (i + tCards.length) % tCards.length;
+      const card = tCards[tIndex];
+      // scroll only the horizontal testimonial track itself — never the page.
+      const targetLeft = card.offsetLeft - (testScroll.clientWidth - card.offsetWidth) / 2;
+      testScroll.scrollTo({left: targetLeft, behavior: reducedMotion ? 'auto' : 'smooth'});
+    }
+    function startAutoplay(){
+      if(reducedMotion) return;
+      clearInterval(tTimer); clearInterval(pTimer);
+      let start = performance.now();
+      pTimer = setInterval(()=>{
+        const p = Math.min(100, ((performance.now()-start)/AUTO_DELAY)*100);
+        progressBar.style.width = p + '%';
+      }, 60);
+      tTimer = setInterval(()=>{
+        goToTestimonial(tIndex+1);
+        start = performance.now();
+      }, AUTO_DELAY);
+    }
+    function stopAutoplay(){ clearInterval(tTimer); clearInterval(pTimer); }
+    testScroll.addEventListener('touchstart', stopAutoplay, {passive:true});
+    testScroll.addEventListener('touchend', ()=>setTimeout(startAutoplay, 3000), {passive:true});
+    startAutoplay();
   });
-});
+
+  /* ---- broken media should be reported, not left as an empty box ---- */
+  init('media', ()=>{
+    document.querySelectorAll('img').forEach(img=>{
+      img.addEventListener('error', ()=>{
+        img.classList.add('img-failed');
+        report('image', new Error('failed to load ' + img.getAttribute('src')));
+      });
+    });
+  });
+})();
 </script>
 
 </body>
