@@ -1,0 +1,16 @@
+{
+  "name": "deghzohiir-el-fakhir-aures",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page for EL FAKHIR AURES",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "vitest": "^2.1.9"
+  }
+}

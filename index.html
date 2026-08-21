@@ -1199,8 +1199,6 @@
     e.preventDefault();
     toast.classList.add('show');
     setTimeout(()=>toast.classList.remove('show'), 2600);
-    e.target.reset();
-    qty = 2; updateTotal(false);
   });
 
   /* ---- testimonials autoplay ---- */
@@ -1256,7 +1254,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const qtyEl = document.getElementById('qtyVal');
     const totalEl = document.getElementById('totalVal');
 
-    const qty = qtyEl ? qtyEl.textContent.trim() : '2';
+    const qtyText = qtyEl ? qtyEl.textContent.trim() : '2';
     const total = totalEl ? totalEl.textContent.trim() : '';
 
     const message =
@@ -1267,7 +1265,7 @@ document.addEventListener('DOMContentLoaded', function () {
 رقم الهاتف: ${phone}
 الولاية: ${state}
 المدينة: ${city}
-عدد الكراتين: ${qty}
+عدد الكراتين: ${qtyText}
 السعر الإجمالي: ${total}`;
 
     const whatsappNumber = '213778188638';
@@ -1275,6 +1273,11 @@ document.addEventListener('DOMContentLoaded', function () {
       'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(message),
       '_blank'
     );
+
+    // reset only after the message is built, so it carries the entered values.
+    form.reset();
+    qty = 2;
+    updateTotal(false);
   });
 });
 </script>
