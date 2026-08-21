@@ -16,6 +16,9 @@
     --wood-line:#3a2717;
     --gold:#d3a75f;
     --gold-light:#f6e0ac;
+    /* translucent accent gold used by every rgba() layer */
+    --gold-rgb:201,160,92;
+    --gold-grad:linear-gradient(135deg, var(--gold-light), var(--gold));
     --copper:#c9793a;
     --cream:#f8efe1;
     --muted:#af9b81;
@@ -81,7 +84,7 @@
   @media (prefers-reduced-motion: reduce){ .orb{animation:none !important;} }
   /* top reading progress line */
   .progress-line{position:fixed; top:0; right:0; left:0; height:2.5px; z-index:60; background:transparent;}
-  .progress-line .fill{height:100%; width:0%; background:linear-gradient(90deg, var(--copper), var(--gold-light)); box-shadow:0 0 12px rgba(201,160,92,.6); transition:width .1s linear;}
+  .progress-line .fill{height:100%; width:0%; background:linear-gradient(90deg, var(--copper), var(--gold-light)); box-shadow:0 0 12px rgba(var(--gold-rgb),.6); transition:width .1s linear;}
 
   h1,h2,h3{font-family:'Amiri', serif;}
   img{max-width:100%; display:block;}
@@ -101,6 +104,61 @@
     display:inline-block;
   }
   .section p{font-size:15px; color:var(--muted); line-height:1.9;}
+
+  /* ---------- SHARED UTILITIES ---------- */
+  /* masked gradient hairline border, tuned per component with --gb-* */
+  .grad-border{position:relative;}
+  .grad-border::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    border-radius:inherit; padding:var(--gb-width, 1px);
+    background:var(--gb-gradient); background-size:var(--gb-size, auto);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:var(--gb-animation, none);
+  }
+  /* frosted card surface, tuned per component with --glass-* */
+  .glass{
+    background:linear-gradient(var(--glass-angle,160deg), var(--glass-top), var(--glass-bottom));
+    backdrop-filter:blur(var(--glass-blur,8px));
+    box-shadow:var(--glass-shadow);
+  }
+  /* frosted rounded chip, tuned per component with --pill-* */
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 14px; border-radius:100px;
+    background:var(--pill-bg, rgba(28,20,12,0.55)); backdrop-filter:blur(10px);
+    border:1px solid rgba(var(--gold-rgb), var(--pill-border-alpha, .3));
+  }
+  /* gold-lit circular badge, tuned per component with --circle-* */
+  .gold-circle{
+    width:var(--circle-size,40px); height:var(--circle-size,40px); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; color:var(--gold-light);
+    background:radial-gradient(circle at 35% 30%, rgba(240,217,168,var(--circle-inner,.22)), rgba(var(--gold-rgb), var(--circle-outer,.06)));
+    border:1px solid var(--circle-border, rgba(var(--gold-rgb), .4));
+  }
+  /* oversized decorative quotation mark, tuned per component with --qm-* */
+  .quote-mark::before{
+    content:"”"; position:absolute; pointer-events:none; font-family:'Amiri', serif;
+    top:var(--qm-top,-18px); left:var(--qm-left,12px);
+    font-size:var(--qm-size,80px); color:rgba(var(--gold-rgb), var(--qm-alpha,.08));
+  }
+  /* looping specular sweep across gold buttons */
+  .btn-primary::before, .submit-btn::before{
+    content:""; position:absolute; top:0; bottom:0; width:40%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,var(--shine-alpha,.55)), transparent);
+    transform:skewX(-20deg) translateX(-220%);
+    animation:shineSweep var(--shine-duration,4.5s) ease-in-out infinite;
+  }
+  @keyframes shineSweep{
+    0%, 55%{transform:skewX(-20deg) translateX(-220%);}
+    75%{transform:skewX(-20deg) translateX(220%);}
+    100%{transform:skewX(-20deg) translateX(220%);}
+  }
+  @media (prefers-reduced-motion: reduce){ .btn-primary::before, .submit-btn::before{animation:none;} }
+  /* parallaxed section backdrop image layer */
+  .section-bg{position:absolute; inset:0; z-index:-1; overflow:hidden;}
+  .section-bg img{width:100%; height:124%; object-fit:cover; opacity:var(--sbg-opacity,1); will-change:transform;}
 
   /* ---------- REVEAL SYSTEM ---------- */
   .reveal{opacity:0; transform:translateY(28px); transition:opacity .8s var(--ease), transform .8s var(--ease);}
@@ -149,18 +207,18 @@
     padding:14px 16px;
     background:rgba(16,11,7,0.4);
     backdrop-filter:blur(0px);
-    border-bottom:1px solid rgba(201,160,92,0);
+    border-bottom:1px solid rgba(var(--gold-rgb),0);
     transition:background .4s var(--ease), backdrop-filter .4s var(--ease), border-color .4s var(--ease);
   }
   header.scrolled{
     background:rgba(16,11,7,0.78); backdrop-filter:blur(12px);
-    border-bottom:1px solid rgba(201,160,92,0.15);
+    border-bottom:1px solid rgba(var(--gold-rgb),0.15);
   }
   .brand{display:flex; align-items:center; gap:10px;}
   .brand img{width:34px; height:34px; border-radius:50%; object-fit:cover; border:1px solid var(--gold);}
   .brand span{font-family:'Amiri', serif; font-size:16px; color:var(--gold-light); font-weight:700;}
   .menu-btn{
-    width:42px; height:42px; border:1px solid rgba(201,160,92,0.4); border-radius:12px;
+    width:42px; height:42px; border:1px solid rgba(var(--gold-rgb),0.4); border-radius:12px;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
     background:transparent; transition:transform .2s;
   }
@@ -174,12 +232,12 @@
     position:fixed; top:0; right:0; bottom:0; width:78%; max-width:320px;
     background:var(--bg-elev); z-index:49; padding:104px 28px 28px;
     transform:translateX(100%); transition:transform .45s var(--ease);
-    border-left:1px solid rgba(201,160,92,0.15);
+    border-left:1px solid rgba(var(--gold-rgb),0.15);
   }
   nav.open{transform:translateX(0);}
   nav a{
     display:block; font-size:18px; color:var(--cream); padding:16px 0;
-    border-bottom:1px solid rgba(201,160,92,0.1);
+    border-bottom:1px solid rgba(var(--gold-rgb),0.1);
     opacity:0; transform:translateX(16px);
     transition:opacity .4s var(--ease), transform .4s var(--ease);
   }
@@ -236,11 +294,7 @@
   }
   @media (prefers-reduced-motion: reduce){ .sparkle{animation:none; opacity:.5;} }
   .trust-badge{
-    position:absolute; top:88px; left:20px; z-index:2;
-    display:flex; align-items:center; gap:10px;
-    padding:10px 14px; border-radius:100px;
-    background:rgba(28,20,12,0.55); backdrop-filter:blur(10px);
-    border:1px solid rgba(201,160,92,0.3);
+    position:absolute; top:88px; left:20px; z-index:2; gap:10px;
     opacity:0; transform:translateY(-10px); animation:heroIn .8s var(--ease) 1.55s forwards;
   }
   .stars-mini{color:var(--gold); font-size:11px; letter-spacing:1px;}
@@ -279,21 +333,9 @@
   }
   .btn:active{transform:scale(0.95);}
   .btn-primary{
-    background:linear-gradient(135deg, var(--gold-light), var(--gold)); color:#241708;
-    box-shadow:0 8px 24px -8px rgba(201,160,92,0.55);
+    background:var(--gold-grad); color:#241708;
+    box-shadow:0 8px 24px -8px rgba(var(--gold-rgb),0.55);
   }
-  .btn-primary::before{
-    content:""; position:absolute; top:0; bottom:0; width:40%;
-    background:linear-gradient(120deg, transparent, rgba(255,255,255,.55), transparent);
-    transform:skewX(-20deg) translateX(-220%);
-    animation:shineSweep 4.5s ease-in-out infinite;
-  }
-  @keyframes shineSweep{
-    0%, 55%{transform:skewX(-20deg) translateX(-220%);}
-    75%{transform:skewX(-20deg) translateX(220%);}
-    100%{transform:skewX(-20deg) translateX(220%);}
-  }
-  @media (prefers-reduced-motion: reduce){ .btn-primary::before{animation:none;} }
   .btn-ghost{border:1px solid rgba(243,233,218,0.35); color:var(--cream);}
   .ripple{position:absolute; border-radius:50%; background:rgba(255,255,255,0.5); transform:scale(0); animation:rippleAnim .6s ease-out;}
   @keyframes rippleAnim{to{transform:scale(3); opacity:0;}}
@@ -315,8 +357,8 @@
   #about{padding-bottom:4px;}
   #about .tag-list{margin-bottom:0;}
   .tag{
-    font-size:12.5px; padding:8px 14px; border-radius:100px; border:1px solid rgba(201,160,92,0.35);
-    color:var(--gold-light); background:rgba(201,160,92,0.06);
+    font-size:12.5px; padding:8px 14px; border-radius:100px; border:1px solid rgba(var(--gold-rgb),0.35);
+    color:var(--gold-light); background:rgba(var(--gold-rgb),0.06);
     transition:transform .2s, background .2s;
   }
   /* corner-frame accent on media + floating badge chip */
@@ -328,12 +370,10 @@
   .media-frame::before{top:12px; right:12px; border-bottom:none; border-left:none;}
   .media-frame::after{bottom:12px; left:12px; border-top:none; border-right:none;}
   .float-chip{
-    position:absolute; z-index:3; display:flex; align-items:center; gap:8px;
-    padding:10px 14px; border-radius:100px;
-    background:rgba(20,14,8,0.72); backdrop-filter:blur(10px);
-    border:1px solid rgba(201,160,92,0.4);
+    position:absolute; z-index:3; white-space:nowrap;
+    --pill-bg:rgba(20,14,8,0.72); --pill-border-alpha:.4;
     box-shadow:0 14px 26px -12px rgba(0,0,0,.7);
-    font-size:12px; color:var(--cream); white-space:nowrap;
+    font-size:12px; color:var(--cream);
   }
   .float-chip .fc-num{font-family:'Amiri', serif; font-size:15px; color:var(--gold-light); font-weight:700;}
 
@@ -344,7 +384,7 @@
   /* ---------- MARQUEE TICKER ---------- */
   .marquee{
     position:relative; overflow:hidden; padding:16px 0; margin:14px 0 -4px;
-    border-top:1px solid rgba(201,160,92,0.14); border-bottom:1px solid rgba(201,160,92,0.14);
+    border-top:1px solid rgba(var(--gold-rgb),0.14); border-bottom:1px solid rgba(var(--gold-rgb),0.14);
   }
   .marquee-track{
     display:flex; width:max-content; gap:0; animation:marqueeScroll 22s linear infinite;
@@ -359,58 +399,42 @@
 
   /* ---------- ORDER CARD WRAPPER ---------- */
   .order-card{
-    position:relative; padding:22px 18px; border-radius:24px; overflow:hidden;
-    background:linear-gradient(165deg, rgba(36,26,16,.7), rgba(20,14,8,.55));
-    backdrop-filter:blur(10px);
-    box-shadow:0 20px 40px -20px rgba(0,0,0,.75);
-  }
-  .order-card::before{
-    content:""; position:absolute; inset:0; border-radius:24px; padding:1.4px;
-    background:linear-gradient(140deg, rgba(201,160,92,.5), transparent 35%, transparent 65%, rgba(201,160,92,.35));
-    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;
+    padding:22px 18px; border-radius:24px; overflow:hidden;
+    --glass-angle:165deg; --glass-top:rgba(36,26,16,.7); --glass-bottom:rgba(20,14,8,.55);
+    --glass-blur:10px; --glass-shadow:0 20px 40px -20px rgba(0,0,0,.75);
+    --gb-width:1.4px;
+    --gb-gradient:linear-gradient(140deg, rgba(var(--gold-rgb),.5), transparent 35%, transparent 65%, rgba(var(--gold-rgb),.35));
   }
 
   /* ---------- FEATURES ---------- */
   .features-wrap{position:relative;}
-  .features-bg{position:absolute; inset:0; z-index:-1; opacity:0.14; overflow:hidden;}
-  .features-bg img{width:100%; height:124%; object-fit:cover; will-change:transform;}
+  .features-bg{--sbg-opacity:0.14;}
   .feat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;}
   .feat-card{
-    background:linear-gradient(160deg, rgba(36,26,16,0.75), rgba(28,20,12,0.55));
-    backdrop-filter:blur(8px);
-    border:1px solid rgba(201,160,92,0.16); border-radius:18px;
-    padding:20px 14px; text-align:center; position:relative; overflow:hidden;
-    box-shadow:0 10px 26px -14px rgba(0,0,0,.6);
+    --glass-top:rgba(36,26,16,0.75); --glass-bottom:rgba(28,20,12,0.55);
+    --glass-shadow:0 10px 26px -14px rgba(0,0,0,.6);
+    --gb-gradient:linear-gradient(135deg, rgba(var(--gold-rgb),.5), transparent 40%, transparent 70%, rgba(var(--gold-rgb),.25));
+    border:1px solid rgba(var(--gold-rgb),0.16); border-radius:18px;
+    padding:20px 14px; text-align:center; overflow:hidden;
     transition:transform .3s var(--ease), border-color .3s, box-shadow .3s;
   }
-  .feat-card::before{
-    content:""; position:absolute; inset:0; border-radius:18px; padding:1px;
-    background:linear-gradient(135deg, rgba(201,160,92,.5), transparent 40%, transparent 70%, rgba(201,160,92,.25));
-    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;
-  }
   .feat-card:active{
-    transform:scale(.96) translateY(-2px); border-color:rgba(201,160,92,.55);
-    box-shadow:0 14px 30px -12px rgba(201,160,92,.35);
+    transform:scale(.96) translateY(-2px); border-color:rgba(var(--gold-rgb),.55);
+    box-shadow:0 14px 30px -12px rgba(var(--gold-rgb),.35);
   }
   .feat-card .icon-ring{
-    width:40px; height:40px; margin:0 auto 12px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, rgba(240,217,168,.22), rgba(201,160,92,.06));
-    color:var(--gold-light);
-    display:flex; align-items:center; justify-content:center;
-    border:1px solid rgba(201,160,92,0.4);
+    margin:0 auto 12px;
     transition:transform .35s var(--ease), background .3s;
   }
   .feat-card .icon-ring svg{width:19px; height:19px;}
-  .feat-card:active .icon-ring{transform:scale(1.12) rotate(8deg); background:rgba(201,160,92,0.25);}
+  .feat-card:active .icon-ring{transform:scale(1.12) rotate(8deg); background:rgba(var(--gold-rgb),0.25);}
   .feat-card p{font-size:12.5px; color:var(--cream); line-height:1.5;}
 
   /* ---------- PACKAGING ---------- */
   .pack-media{border-radius:var(--radius); overflow:hidden; margin-bottom:20px;}
   .pack-list{display:flex; flex-direction:column; gap:12px; margin-top:16px;}
   .pack-item{display:flex; align-items:center; gap:12px; font-size:14px; color:var(--cream);}
-  .pack-item .dot{width:8px; height:8px; border-radius:50%; background:var(--gold); flex:none; box-shadow:0 0 0 0 rgba(201,160,92,.5);}
+  .pack-item .dot{width:8px; height:8px; border-radius:50%; background:var(--gold); flex:none; box-shadow:0 0 0 0 rgba(var(--gold-rgb),.5);}
   .stagger.in-view .pack-item .dot{animation:dotPop .5s var(--ease) forwards;}
   .pack-item:nth-child(1) .dot{animation-delay:.1s;}
   .pack-item:nth-child(2) .dot{animation-delay:.25s;}
@@ -422,7 +446,7 @@
   /* ---------- DELIVERY READY VISUAL ---------- */
   .delivery-ready{
     position:relative; margin-top:24px; border-radius:var(--radius); overflow:hidden;
-    border:1px solid rgba(201,160,92,.28); box-shadow:0 20px 42px -20px rgba(0,0,0,.75);
+    border:1px solid rgba(var(--gold-rgb),.28); box-shadow:0 20px 42px -20px rgba(0,0,0,.75);
     background:#140e08;
   }
   .delivery-ready img{
@@ -433,7 +457,7 @@
     position:absolute; right:14px; left:14px; bottom:14px;
     display:flex; align-items:center; gap:11px; padding:12px 14px;
     border-radius:16px; background:rgba(18,12,7,.84);
-    border:1px solid rgba(201,160,92,.38); backdrop-filter:blur(8px);
+    border:1px solid rgba(var(--gold-rgb),.38); backdrop-filter:blur(8px);
   }
   .delivery-ready-overlay strong{
     display:block; color:var(--cream); font-size:14px; margin-bottom:3px;
@@ -466,7 +490,7 @@
   }
   .g-card.active{
     transform:scale(1) translateY(0) rotateY(0deg); opacity:1; filter:saturate(1) brightness(1);
-    box-shadow:0 34px 60px -14px rgba(0,0,0,.65), 0 0 0 1px rgba(201,160,92,.4), 0 0 40px -6px rgba(201,160,92,.25);
+    box-shadow:0 34px 60px -14px rgba(0,0,0,.65), 0 0 0 1px rgba(var(--gold-rgb),.4), 0 0 40px -6px rgba(var(--gold-rgb),.25);
   }
   .g-card .g-bg{
     position:absolute; inset:-12%; width:124%; height:124%; object-fit:cover;
@@ -486,66 +510,51 @@
   .g-num{
     position:absolute; top:14px; left:14px; z-index:3; font-family:'Amiri', serif; font-size:12.5px;
     color:var(--gold-light); background:rgba(16,11,7,.55); backdrop-filter:blur(6px);
-    padding:5px 11px; border-radius:100px; border:1px solid rgba(201,160,92,.35); letter-spacing:1px;
+    padding:5px 11px; border-radius:100px; border:1px solid rgba(var(--gold-rgb),.35); letter-spacing:1px;
   }
   .g-info{position:absolute; bottom:0; left:0; right:0; z-index:3; padding:20px 18px;}
   .g-info h3{font-size:17px; color:var(--gold-light); margin-bottom:4px;}
   .g-info span{font-size:12px; color:var(--muted);}
   .gallery-progress{display:flex; align-items:center; justify-content:center; gap:10px; margin-top:4px;}
   .gallery-progress .count{font-family:'Amiri', serif; font-size:12.5px; color:var(--muted-2); letter-spacing:1.5px;}
-  .gallery-progress .track{width:110px; height:2px; border-radius:2px; background:rgba(201,160,92,.15); overflow:hidden;}
+  .gallery-progress .track{width:110px; height:2px; border-radius:2px; background:rgba(var(--gold-rgb),.15); overflow:hidden;}
   .gallery-progress .bar{height:100%; width:25%; background:linear-gradient(90deg, var(--gold), var(--gold-light)); transition:width .4s var(--ease);}
 
   .quote-block{
     margin-top:16px; padding:18px; border-radius:var(--radius); background:var(--bg-elev);
     border-right:3px solid var(--gold); position:relative; overflow:hidden;
   }
-  .quote-block::before{
-    content:"”"; position:absolute; top:-18px; left:12px; font-family:'Amiri',serif;
-    font-size:80px; color:rgba(201,160,92,0.08);
-  }
   .quote-block p{color:var(--cream); font-size:14.5px; line-height:1.9; position:relative;}
 
   /* ---------- STATS ---------- */
   .stats-wrap{position:relative;}
-  .stats-bg{position:absolute; inset:0; z-index:-1; overflow:hidden;}
-  .stats-bg img{width:100%; height:124%; object-fit:cover; opacity:0.22; will-change:transform;}
-  .stats-bg::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, var(--bg), rgba(16,11,7,0.85));}
   .stats-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px;}
   .stat-card{
     text-align:center; padding:26px 10px; border-radius:20px; position:relative; overflow:hidden;
-    background:linear-gradient(160deg, rgba(36,26,16,.8), rgba(24,17,10,.6));
-    backdrop-filter:blur(8px);
-    border:1px solid rgba(201,160,92,0.22);
-    box-shadow:0 12px 28px -16px rgba(0,0,0,.7);
+    --glass-top:rgba(36,26,16,.8); --glass-bottom:rgba(24,17,10,.6);
+    --glass-shadow:0 12px 28px -16px rgba(0,0,0,.7);
+    border:1px solid rgba(var(--gold-rgb),0.22);
     transition:transform .3s var(--ease), box-shadow .3s;
   }
-  .stat-card.pulse{box-shadow:0 0 0 8px rgba(201,160,92,0.1), 0 12px 28px -16px rgba(0,0,0,.7);}
-  .stat-card .num{font-family:'Amiri', serif; font-size:33px; color:var(--gold-light); font-weight:700; text-shadow:0 0 24px rgba(201,160,92,.35);}
-  .stat-card .num-static{font-family:'Amiri', serif; font-size:33px; color:var(--gold-light); font-weight:700; text-shadow:0 0 24px rgba(201,160,92,.35);}
+  .stat-card.pulse{box-shadow:0 0 0 8px rgba(var(--gold-rgb),0.1), 0 12px 28px -16px rgba(0,0,0,.7);}
+  .stat-card .num, .stat-card .num-static{font-family:'Amiri', serif; font-size:33px; color:var(--gold-light); font-weight:700; text-shadow:0 0 24px rgba(var(--gold-rgb),.35);}
   .stat-card .label{font-size:12px; color:var(--muted); margin-top:8px;}
   .badges{display:flex; justify-content:center; gap:18px; margin-top:24px; font-size:13px; color:var(--muted);}
 
   /* ---------- ORDER ---------- */
   .order-wrap{position:relative;}
-  .order-bg{position:absolute; inset:0; z-index:-1; overflow:hidden;}
-  .order-bg img{width:100%; height:124%; object-fit:cover; opacity:0.12; will-change:transform;}
+  .order-bg{--sbg-opacity:0.12;}
   .price-banner{
-    position:relative; background:linear-gradient(135deg, rgba(201,160,92,0.16), rgba(201,160,92,0.02));
+    background:linear-gradient(135deg, rgba(var(--gold-rgb),0.16), rgba(var(--gold-rgb),0.02));
     border-radius:18px; padding:17px; margin:16px 0 22px;
     display:flex; justify-content:space-between; align-items:center;
     overflow:hidden;
-  }
-  .price-banner::before{
-    content:""; position:absolute; inset:0; border-radius:18px; padding:1.5px;
-    background:linear-gradient(115deg, var(--gold), transparent 30%, transparent 70%, var(--gold-light));
-    background-size:220% 220%;
-    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude;
-    animation:borderShimmer 5s ease-in-out infinite;
+    --gb-width:1.5px; --gb-size:220% 220%;
+    --gb-gradient:linear-gradient(115deg, var(--gold), transparent 30%, transparent 70%, var(--gold-light));
+    --gb-animation:borderShimmer 5s ease-in-out infinite;
   }
   @keyframes borderShimmer{0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;}}
-  @media (prefers-reduced-motion: reduce){ .price-banner::before{animation:none;} }
+  @media (prefers-reduced-motion: reduce){ .price-banner{--gb-animation:none;} }
   .price-banner .p{font-family:'Amiri', serif; font-size:24px; font-weight:700; color:var(--gold-light); text-shadow:0 0 20px rgba(211,167,95,.35);}
   .price-banner .u{font-size:11px; color:var(--muted);}
   form{display:flex; flex-direction:column; gap:16px;}
@@ -574,13 +583,13 @@
     width:36px; height:36px; border-radius:50%; border:1px solid var(--gold); color:var(--gold-light);
     background:transparent; font-size:18px; line-height:1; transition:transform .15s, background .2s;
   }
-  .qty-ctrl button:active{transform:scale(.85); background:rgba(201,160,92,.2);}
+  .qty-ctrl button:active{transform:scale(.85); background:rgba(var(--gold-rgb),.2);}
   .qty-ctrl span{min-width:22px; text-align:center; font-size:16px; display:inline-block;}
   .qty-ctrl span.bump{animation:bump .3s var(--ease);}
   @keyframes bump{0%{transform:scale(1);} 50%{transform:scale(1.35);} 100%{transform:scale(1);}}
   .total-row{
     display:flex; justify-content:space-between; align-items:center; padding:16px 4px 4px;
-    border-top:1px dashed rgba(201,160,92,0.25); margin-top:8px;
+    border-top:1px dashed rgba(var(--gold-rgb),0.25); margin-top:8px;
   }
   .total-row .t-label{font-size:13px; color:var(--muted);}
   .total-row .t-val{font-family:'Amiri', serif; font-size:28px; font-weight:700; color:var(--gold-light); text-shadow:0 0 22px rgba(211,167,95,.4); transition:transform .2s;}
@@ -588,16 +597,11 @@
   @keyframes flash{0%{transform:scale(1); color:var(--gold-light);} 40%{transform:scale(1.12); color:#fff3d6;} 100%{transform:scale(1); color:var(--gold-light);}}
   .submit-btn{
     margin-top:8px; padding:19px; border-radius:100px; border:none;
-    background:linear-gradient(135deg, var(--gold-light), var(--gold)); color:#241708;
+    background:var(--gold-grad); color:#241708;
     font-size:16px; font-weight:700; letter-spacing:.5px; position:relative; overflow:hidden;
     box-shadow:0 12px 32px -8px rgba(211,167,95,0.65);
     transition:transform .2s var(--ease);
-  }
-  .submit-btn::before{
-    content:""; position:absolute; top:0; bottom:0; width:40%;
-    background:linear-gradient(120deg, transparent, rgba(255,255,255,.6), transparent);
-    transform:skewX(-20deg) translateX(-220%);
-    animation:shineSweep 3.5s ease-in-out infinite;
+    --shine-alpha:.6; --shine-duration:3.5s;
   }
   .submit-btn:active{transform:scale(.97);}
   .form-note{text-align:center; font-size:12px; color:var(--muted-2); margin-top:10px;}
@@ -611,8 +615,7 @@
 
   /* ---------- TESTIMONIALS ---------- */
   .test-wrap{position:relative;}
-  .test-bg{position:absolute; inset:0; z-index:-1; overflow:hidden;}
-  .test-bg img{width:100%; height:124%; object-fit:cover; opacity:0.13; will-change:transform;}
+  .test-bg{--sbg-opacity:0.13;}
   .test-scroll{
     display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory;
     padding:8px 20px 8px; margin:16px -20px 0; -webkit-overflow-scrolling:touch;
@@ -620,33 +623,27 @@
   .test-scroll::-webkit-scrollbar{display:none;}
   .t-card{
     scroll-snap-align:center; flex:0 0 85%; position:relative; overflow:hidden;
-    background:linear-gradient(160deg, rgba(36,26,16,.78), rgba(24,17,10,.55));
-    backdrop-filter:blur(8px);
-    border:1px solid rgba(201,160,92,0.18);
+    --glass-top:rgba(36,26,16,.78); --glass-bottom:rgba(24,17,10,.55);
+    --glass-shadow:0 14px 30px -18px rgba(0,0,0,.7);
+    --qm-top:-22px; --qm-left:16px; --qm-size:96px; --qm-alpha:.1;
+    border:1px solid rgba(var(--gold-rgb),0.18);
     border-radius:20px; padding:22px; transition:border-color .3s;
-    box-shadow:0 14px 30px -18px rgba(0,0,0,.7);
-  }
-  .t-card::before{
-    content:"”"; position:absolute; top:-22px; left:16px; font-family:'Amiri',serif;
-    font-size:96px; color:rgba(201,160,92,0.1); pointer-events:none;
   }
   .stars{color:var(--gold); font-size:14px; margin-bottom:10px; letter-spacing:2px; position:relative;}
   .t-card p{font-size:14px; color:var(--cream); line-height:1.85; margin-bottom:16px; position:relative;}
   .t-who{display:flex; align-items:center; gap:10px; position:relative;}
   .t-avatar{
-    width:40px; height:40px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, rgba(240,217,168,.3), rgba(201,160,92,.08));
-    display:flex; align-items:center; justify-content:center; color:var(--gold-light); font-weight:700;
-    border:1px solid var(--gold); box-shadow:0 0 0 3px rgba(201,160,92,.08);
+    --circle-inner:.3; --circle-outer:.08; --circle-border:var(--gold);
+    font-weight:700; box-shadow:0 0 0 3px rgba(var(--gold-rgb),.08);
   }
   .t-who .name{font-size:13.5px; color:var(--cream); font-weight:700;}
   .t-who .role{font-size:11.5px; color:var(--muted-2);}
-  .test-progress{height:2px; background:rgba(201,160,92,.15); border-radius:2px; margin-top:16px; overflow:hidden;}
+  .test-progress{height:2px; background:rgba(var(--gold-rgb),.15); border-radius:2px; margin-top:16px; overflow:hidden;}
   .test-progress-bar{height:100%; width:0%; background:linear-gradient(90deg, var(--copper), var(--gold-light)); transition:width .05s linear;}
 
   /* ---------- FOOTER ---------- */
   footer{
-    padding:48px 20px 20px; text-align:center; border-top:1px solid rgba(201,160,92,0.15);
+    padding:48px 20px 20px; text-align:center; border-top:1px solid rgba(var(--gold-rgb),0.15);
     margin-top:20px;
   }
   footer img{width:52px; margin:0 auto 12px; border-radius:50%; border:1px solid var(--gold);}
@@ -657,11 +654,11 @@
   .contact-row{display:flex; flex-direction:column; gap:8px; font-size:13px; color:var(--muted); margin-bottom:20px;}
   .social-row{display:flex; justify-content:center; gap:12px; margin-bottom:20px;}
   .social-row a{
-    width:38px; height:38px; border-radius:50%; border:1px solid rgba(201,160,92,0.35);
+    width:38px; height:38px; border-radius:50%; border:1px solid rgba(var(--gold-rgb),0.35);
     display:flex; align-items:center; justify-content:center; color:var(--gold-light);
     transition:transform .2s, background .2s;
   }
-  .social-row a:active{transform:scale(.85); background:rgba(201,160,92,.15);}
+  .social-row a:active{transform:scale(.85); background:rgba(var(--gold-rgb),.15);}
   .foot-ornament{color:var(--gold); font-size:12px; margin-bottom:14px; opacity:.7;}
   .copyright{font-size:11.5px; color:var(--muted-2);}
 
@@ -671,7 +668,7 @@
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     padding:12px 16px calc(12px + var(--safe-b));
     background:rgba(16,11,7,0.92); backdrop-filter:blur(14px);
-    border-top:1px solid rgba(201,160,92,0.2);
+    border-top:1px solid rgba(var(--gold-rgb),0.2);
     transform:translateY(100%); transition:transform .45s var(--ease);
   }
   .sticky-bar.visible{transform:translateY(0);}
@@ -681,8 +678,8 @@
   .sticky-bar .btn{padding:12px 22px; font-size:13.5px;}
   .sticky-bar .btn-primary{animation:softGlow 2.6s ease-in-out infinite;}
   @keyframes softGlow{
-    0%,100%{box-shadow:0 8px 24px -8px rgba(201,160,92,0.4);}
-    50%{box-shadow:0 8px 30px -4px rgba(201,160,92,0.75);}
+    0%,100%{box-shadow:0 8px 24px -8px rgba(var(--gold-rgb),0.4);}
+    50%{box-shadow:0 8px 30px -4px rgba(var(--gold-rgb),0.75);}
   }
 
   @media (min-width:480px){
@@ -703,6 +700,10 @@
   <div class="splash-sub">EL FAKHIR AURES</div>
   <div class="splash-line"></div>
 </div>
+
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="icon-sparkle" viewBox="0 0 24 24"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" fill="currentColor"/></symbol>
+</svg>
 
 <div class="ambient"><span class="orb orb-1"></span><span class="orb orb-2"></span><span class="orb orb-3"></span></div>
 <div class="progress-line"><div class="fill" id="progressFill"></div></div>
@@ -737,10 +738,10 @@
     <path d="M35 140 C 25 110, 45 100, 35 70 C 25 40, 45 30, 37 0"/>
     <path d="M58 140 C 48 110, 68 100, 58 70 C 48 40, 68 30, 60 0"/>
   </svg>
-  <div class="sparkle" style="top:22%; right:14%; width:16px; height:16px; animation-delay:.3s;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg></div>
-  <div class="sparkle" style="top:34%; left:18%; width:11px; height:11px; animation-delay:1.6s;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg></div>
-  <div class="sparkle" style="top:16%; left:30%; width:9px; height:9px; animation-delay:2.4s;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z"/></svg></div>
-  <div class="trust-badge">
+  <div class="sparkle" style="top:22%; right:14%; width:16px; height:16px; animation-delay:.3s;"><svg><use href="#icon-sparkle"/></svg></div>
+  <div class="sparkle" style="top:34%; left:18%; width:11px; height:11px; animation-delay:1.6s;"><svg><use href="#icon-sparkle"/></svg></div>
+  <div class="sparkle" style="top:16%; left:30%; width:9px; height:9px; animation-delay:2.4s;"><svg><use href="#icon-sparkle"/></svg></div>
+  <div class="trust-badge pill">
     <div class="stars-mini">★★★★★</div>
     <div class="tb-text"><strong>+500</strong> عميل يثق بفخامتنا</div>
   </div>
@@ -760,7 +761,7 @@
 <section class="section" id="about">
   <div class="about-media media-frame curtain reveal" style="position:relative;">
     <img src="images/photo N 2.png" alt="عيدان تحريك خشبية فاخرة عن قرب">
-    <div class="float-chip" style="bottom:14px; right:14px;"><span class="fc-num">+500</span> عميل راضٍ</div>
+    <div class="float-chip pill" style="bottom:14px; right:14px;"><span class="fc-num">+500</span> عميل راضٍ</div>
   </div>
   <div class="eyebrow reveal">من نحن</div>
   <h2 class="reveal">لماذا الفاخر الأوراس؟</h2>
@@ -778,18 +779,18 @@
 
 <!-- FEATURES -->
 <section class="section features-wrap" id="features">
-  <div class="features-bg"><img src="images/photo N 3.png" alt="خلفية خشبية داكنة فاخرة"></div>
+  <div class="section-bg features-bg"><img src="images/photo N 3.png" alt="خلفية خشبية داكنة فاخرة"></div>
   <div class="eyebrow reveal">المميزات</div>
   <h2 class="reveal">ما الذي يجعلنا مختلفين</h2>
   <div class="feat-grid stagger">
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 L12 22 M12 6 C 8 6 6 4 6 4 M12 10 C 16 10 18 8 18 8 M12 14 C 8 14 6 12 6 12"/></svg></div><p>خشب طبيعي 100%</p></div>
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3c4 1 7 4 7 9a7 7 0 0 1-14 0c0-3 2-5 3-7 0 2 1 3 2 3 0-2-1-3 2-5z"/></svg></div><p>صديق للبيئة</p></div>
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8c3-2 5 2 8 0s5 2 8 0M3 14c3-2 5 2 8 0s5 2 8 0"/></svg></div><p>سطح ناعم</p></div>
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l7 3v6c0 5-3 8-7 11-4-3-7-6-7-11V5z"/></svg></div><p>مقاوم للكسر</p></div>
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3c0 2-2 2-2 4a2 2 0 0 0 4 0c0-2-2-2-2-4zM14 3c0 2-2 2-2 4a2 2 0 0 0 4 0c0-2-2-2-2-4zM5 12h14l-1 5a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/></svg></div><p>مناسب للمشروبات الساخنة</p></div>
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l7 3v6c0 5-3 8-7 11-4-3-7-6-7-11V5z M9 12l2 2 4-4"/></svg></div><p>آمن غذائياً</p></div>
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 5l14 14M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5"/></svg></div><p>خالٍ من المواد الكيميائية</p></div>
-    <div class="feat-card"><div class="icon-ring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.6 5.7 6.2.6-4.7 4.2 1.4 6.1L12 15.9 6.5 18.6l1.4-6.1L3.2 8.3l6.2-.6z"/></svg></div><p>جودة تصنيع احترافية</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 L12 22 M12 6 C 8 6 6 4 6 4 M12 10 C 16 10 18 8 18 8 M12 14 C 8 14 6 12 6 12"/></svg></div><p>خشب طبيعي 100%</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3c4 1 7 4 7 9a7 7 0 0 1-14 0c0-3 2-5 3-7 0 2 1 3 2 3 0-2-1-3 2-5z"/></svg></div><p>صديق للبيئة</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8c3-2 5 2 8 0s5 2 8 0M3 14c3-2 5 2 8 0s5 2 8 0"/></svg></div><p>سطح ناعم</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l7 3v6c0 5-3 8-7 11-4-3-7-6-7-11V5z"/></svg></div><p>مقاوم للكسر</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3c0 2-2 2-2 4a2 2 0 0 0 4 0c0-2-2-2-2-4zM14 3c0 2-2 2-2 4a2 2 0 0 0 4 0c0-2-2-2-2-4zM5 12h14l-1 5a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/></svg></div><p>مناسب للمشروبات الساخنة</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l7 3v6c0 5-3 8-7 11-4-3-7-6-7-11V5z M9 12l2 2 4-4"/></svg></div><p>آمن غذائياً</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 5l14 14M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5"/></svg></div><p>خالٍ من المواد الكيميائية</p></div>
+    <div class="feat-card glass grad-border"><div class="icon-ring gold-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.6 5.7 6.2.6-4.7 4.2 1.4 6.1L12 15.9 6.5 18.6l1.4-6.1L3.2 8.3l6.2-.6z"/></svg></div><p>جودة تصنيع احترافية</p></div>
   </div>
 </section>
 
@@ -797,7 +798,7 @@
 <section class="section" id="packaging">
   <div class="pack-media media-frame curtain reveal" style="position:relative;">
     <img src="images/photo N 4.png" alt="تغليف احترافي لعيدان التحريك">
-    <div class="float-chip" style="top:14px; left:14px;"><span class="fc-num">✓</span> تغليف آمن 100%</div>
+    <div class="float-chip pill" style="top:14px; left:14px;"><span class="fc-num">✓</span> تغليف آمن 100%</div>
   </div>
   <div class="eyebrow reveal">التغليف</div>
   <h2 class="reveal">تغليف احترافي يحافظ على الجودة</h2>
@@ -859,7 +860,7 @@
     <div class="track"><div class="bar" id="galleryBar"></div></div>
     <span class="count" id="galleryCountEnd">04</span>
   </div>
-  <div class="quote-block reveal">
+  <div class="quote-block quote-mark reveal">
     <p>عود واحد بسيط، لكنه يُكمل طقس القهوة بأكمله. في المقاهي، المطاعم والفنادق، تبقى اللمسة الأخيرة هي ما يُذكر. نحن نصنع تلك اللمسة.</p>
   </div>
 </section>
@@ -869,10 +870,10 @@
   <div class="eyebrow reveal">أرقامنا</div>
   <h2 class="reveal">الجودة تُقاس بالأرقام</h2>
   <div class="stats-grid stagger">
-    <div class="stat-card"><div class="num" data-count="6400">0</div><div class="label">قطعة في الكرتون الواحد</div></div>
-    <div class="stat-card"><div class="num" data-count="100" data-suffix="%">0%</div><div class="label">خشب طبيعي خالص</div></div>
-    <div class="stat-card"><div class="num" data-count="5" data-suffix="★">0★</div><div class="label">جودة تصنيع عالية</div></div>
-    <div class="stat-card"><div class="num-static">24/7</div><div class="label">جاهز للتوزيع الفوري</div></div>
+    <div class="stat-card glass"><div class="num" data-count="6400">0</div><div class="label">قطعة في الكرتون الواحد</div></div>
+    <div class="stat-card glass"><div class="num" data-count="100" data-suffix="%">0%</div><div class="label">خشب طبيعي خالص</div></div>
+    <div class="stat-card glass"><div class="num" data-count="5" data-suffix="★">0★</div><div class="label">جودة تصنيع عالية</div></div>
+    <div class="stat-card glass"><div class="num-static">24/7</div><div class="label">جاهز للتوزيع الفوري</div></div>
   </div>
   <div class="badges reveal"><span>☕ مقاهي</span><span>🍽️ مطاعم</span><span>🏨 فنادق</span></div>
 </section>
@@ -881,11 +882,11 @@
 
 <!-- ORDER -->
 <section class="section order-wrap" id="order">
-  <div class="order-bg"><img src="images/photo N 10.png" alt="طاولة فاخرة مع قهوة وعيدان تحريك خشبية"></div>
+  <div class="section-bg order-bg"><img src="images/photo N 10.png" alt="طاولة فاخرة مع قهوة وعيدان تحريك خشبية"></div>
   <div class="eyebrow reveal">اطلب الآن</div>
   <h2 class="reveal">أضف لمسة الفخامة</h2>
-  <div class="order-card reveal">
-    <div class="price-banner">
+  <div class="order-card glass grad-border reveal">
+    <div class="price-banner grad-border">
       <div><div class="p">45,000 دج</div><div class="u">لكل كرتون</div></div>
       <div style="text-align:left"><div class="p">6400</div><div class="u">قطعة خشب طبيعي 100%</div></div>
     </div>
@@ -915,24 +916,24 @@
 
 <!-- TESTIMONIALS -->
 <section class="section test-wrap" id="testimonials">
-  <div class="test-bg"><img src="images/photo N 11.png" alt="داخل مقهى فاخر"></div>
+  <div class="section-bg test-bg"><img src="images/photo N 11.png" alt="داخل مقهى فاخر"></div>
   <div class="eyebrow reveal">آراء العملاء</div>
   <h2 class="reveal">ثقة عملائنا شرف لنا</h2>
   <div class="test-scroll" id="testScroll">
-    <div class="t-card">
+    <div class="t-card glass quote-mark">
       <div class="stars">★★★★★</div>
       <p>"جودة عالية ولمسة فاخرة حقيقية. عملاؤنا لاحظوا الفرق من أول استخدام."</p>
-      <div class="t-who"><div class="t-avatar">س</div><div><div class="name">سفيان بلقاسم</div><div class="role">صاحب مقهى</div></div></div>
+      <div class="t-who"><div class="t-avatar gold-circle">س</div><div><div class="name">سفيان بلقاسم</div><div class="role">صاحب مقهى</div></div></div>
     </div>
-    <div class="t-card">
+    <div class="t-card glass quote-mark">
       <div class="stars">★★★★★</div>
       <p>"التغليف احترافي والتسليم في الوقت المحدد. شريك موثوق لمطعمنا."</p>
-      <div class="t-who"><div class="t-avatar">أ</div><div><div class="name">أمينة زروقي</div><div class="role">مديرة مطعم</div></div></div>
+      <div class="t-who"><div class="t-avatar gold-circle">أ</div><div><div class="name">أمينة زروقي</div><div class="role">مديرة مطعم</div></div></div>
     </div>
-    <div class="t-card">
+    <div class="t-card glass quote-mark">
       <div class="stars">★★★★★</div>
       <p>"أفضل حل لتجنب الأمراض الناتجة عن الملاعق البلاستيكية"</p>
-      <div class="t-who"><div class="t-avatar">ك</div><div><div class="name">كريم مرزوقي</div><div class="role">مدير فندق</div></div></div>
+      <div class="t-who"><div class="t-avatar gold-circle">ك</div><div><div class="name">كريم مرزوقي</div><div class="role">مدير فندق</div></div></div>
     </div>
   </div>
   <div class="test-progress"><div class="test-progress-bar" id="testProgressBar"></div></div>
@@ -978,8 +979,35 @@
 <script>
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ---- shared helpers ---- */
+  const byId = (id)=>document.getElementById(id);
+  /* rAF-throttled scroll handler, run once up-front to sync initial state */
+  function onScroll(handler){
+    let ticking = false;
+    window.addEventListener('scroll', ()=>{
+      if(ticking) return;
+      ticking = true;
+      requestAnimationFrame(()=>{ handler(); ticking = false; });
+    }, {passive:true});
+    handler();
+  }
+  /* observe elements and hand each entry to the callback with its observer */
+  function observeVisibility(targets, callback, options){
+    const observer = new IntersectionObserver((entries)=>entries.forEach(e=>callback(e, observer)), options);
+    targets.forEach(t=>observer.observe(t));
+    return observer;
+  }
+  /* replay a one-shot CSS animation class */
+  function restartAnimation(el, cls){
+    el.classList.remove(cls);
+    void el.offsetWidth;
+    el.classList.add(cls);
+  }
+  const fmt = (n)=>Number(n).toLocaleString('en-US');
+  const pad = (n)=>String(n).padStart(2,'0');
+
   /* ---- splash intro ---- */
-  const splash = document.getElementById('splash');
+  const splash = byId('splash');
   function endSplash(){
     if(splash.classList.contains('hide')) return;
     splash.classList.add('hide');
@@ -989,31 +1017,27 @@
   splash.addEventListener('click', endSplash);
 
   /* ---- top reading progress bar ---- */
-  const progressFill = document.getElementById('progressFill');
-  function updateProgressBar(){
+  const progressFill = byId('progressFill');
+  onScroll(()=>{
     const h = document.documentElement;
     const scrollable = h.scrollHeight - h.clientHeight;
     const pct = scrollable > 0 ? (h.scrollTop / scrollable) * 100 : 0;
     progressFill.style.width = pct + '%';
-  }
-  window.addEventListener('scroll', updateProgressBar, {passive:true});
-  updateProgressBar();
+  });
 
   /* ---- header scroll state ---- */
-  const header = document.getElementById('siteHeader');
-  const stickyBar = document.getElementById('stickyBar');
-  const heroEl = document.getElementById('hero');
+  const header = byId('siteHeader');
+  const stickyBar = byId('stickyBar');
 
-  const heroObserver = new IntersectionObserver(([entry])=>{
+  observeVisibility([byId('hero')], (entry)=>{
     header.classList.toggle('scrolled', !entry.isIntersecting);
     stickyBar.classList.toggle('visible', !entry.isIntersecting);
   }, {threshold:0.15});
-  heroObserver.observe(heroEl);
 
   /* ---- menu toggle ---- */
-  const menuBtn = document.getElementById('menuBtn');
-  const nav = document.getElementById('nav');
-  const overlay = document.getElementById('overlay');
+  const menuBtn = byId('menuBtn');
+  const nav = byId('nav');
+  const overlay = byId('overlay');
   function closeMenu(){
     menuBtn.classList.remove('open');
     nav.classList.remove('open');
@@ -1028,63 +1052,45 @@
   document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click', closeMenu));
 
   /* ---- scroll reveal ---- */
-  const revealEls = document.querySelectorAll('.reveal, .stagger, .stir-divider');
-  const revealObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('in-view');
-        entry.target.classList.add('drawn');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, {threshold:0.18, rootMargin:'0px 0px -40px 0px'});
-  revealEls.forEach(el=>revealObserver.observe(el));
+  observeVisibility(
+    document.querySelectorAll('.reveal, .stagger, .stir-divider'),
+    (entry, observer)=>{
+      if(!entry.isIntersecting) return;
+      entry.target.classList.add('in-view', 'drawn');
+      observer.unobserve(entry.target);
+    },
+    {threshold:0.18, rootMargin:'0px 0px -40px 0px'}
+  );
 
   /* ---- hero parallax ---- */
-  const heroMedia = document.getElementById('heroMedia');
+  const heroMedia = byId('heroMedia');
   if(!reducedMotion){
-    let ticking = false;
-    window.addEventListener('scroll', ()=>{
-      if(!ticking){
-        requestAnimationFrame(()=>{
-          const y = window.scrollY;
-          if(y < window.innerHeight * 1.1){
-            heroMedia.style.transform = `translateY(${y * 0.28}px)`;
-          }
-          ticking = false;
-        });
-        ticking = true;
+    onScroll(()=>{
+      const y = window.scrollY;
+      if(y < window.innerHeight * 1.1){
+        heroMedia.style.transform = `translateY(${y * 0.28}px)`;
       }
-    }, {passive:true});
+    });
   }
 
   /* ---- ambient background parallax across sections ---- */
-  const bgParallaxImgs = document.querySelectorAll('.features-bg img, .stats-bg img, .order-bg img, .test-bg img');
+  const bgParallaxImgs = document.querySelectorAll('.section-bg img');
   if(!reducedMotion && bgParallaxImgs.length){
-    let bgTicking = false;
-    function updateBgParallax(){
+    onScroll(()=>{
       bgParallaxImgs.forEach(img=>{
         const rect = img.parentElement.getBoundingClientRect();
         const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
         const shift = (Math.min(1, Math.max(0, progress)) - 0.5) * 60;
         img.style.transform = `translateY(${shift}px)`;
       });
-    }
-    window.addEventListener('scroll', ()=>{
-      if(!bgTicking){
-        requestAnimationFrame(()=>{ updateBgParallax(); bgTicking = false; });
-        bgTicking = true;
-      }
-    }, {passive:true});
-    updateBgParallax();
+    });
   }
 
   /* ---- gallery premium 3D carousel ---- */
-  const galleryScroll = document.getElementById('galleryScroll');
+  const galleryScroll = byId('galleryScroll');
   const gCards = [...galleryScroll.children];
-  const galleryBar = document.getElementById('galleryBar');
-  const galleryCountStart = document.getElementById('galleryCountStart');
-  function pad(n){ return String(n).padStart(2,'0'); }
+  const galleryBar = byId('galleryBar');
+  const galleryCountStart = byId('galleryCountStart');
   function updateGallery(){
     const center = galleryScroll.scrollLeft + galleryScroll.clientWidth/2;
     let closestIdx = 0, closestDist = Infinity;
@@ -1130,50 +1136,43 @@
   galleryScroll.addEventListener('pointerleave', (e)=>{ if(e.pointerType === 'mouse') endGalleryDrag(e); });
 
   /* ---- animated counters ---- */
-  const nums = document.querySelectorAll('.num');
-  const counterObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        const el = entry.target;
-        const card = el.closest('.stat-card');
-        const target = parseInt(el.dataset.count, 10);
-        const suffix = el.dataset.suffix || '';
-        const duration = 1400;
-        const start = performance.now();
-        function easeOutExpo(t){ return t===1 ? 1 : 1 - Math.pow(2, -10*t); }
-        function tick(now){
-          const p = Math.min(1, (now - start)/duration);
-          const eased = easeOutExpo(p);
-          el.textContent = Math.round(target*eased).toLocaleString('en-US') + suffix;
-          if(p < 1){ requestAnimationFrame(tick); }
-          else { card.classList.add('pulse'); setTimeout(()=>card.classList.remove('pulse'), 500); }
-        }
-        requestAnimationFrame(tick);
-        counterObserver.unobserve(el);
-      }
-    });
+  observeVisibility(document.querySelectorAll('.num'), (entry, observer)=>{
+    if(!entry.isIntersecting) return;
+    const el = entry.target;
+    const card = el.closest('.stat-card');
+    const target = parseInt(el.dataset.count, 10);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1400;
+    const start = performance.now();
+    const easeOutExpo = (t)=> t===1 ? 1 : 1 - Math.pow(2, -10*t);
+    function tick(now){
+      const p = Math.min(1, (now - start)/duration);
+      el.textContent = fmt(Math.round(target*easeOutExpo(p))) + suffix;
+      if(p < 1){ requestAnimationFrame(tick); }
+      else { card.classList.add('pulse'); setTimeout(()=>card.classList.remove('pulse'), 500); }
+    }
+    requestAnimationFrame(tick);
+    observer.unobserve(el);
   }, {threshold:0.5});
-  nums.forEach(n=>counterObserver.observe(n));
 
   /* ---- order form: qty + total ---- */
   const unitPrice = 45000;
   let qty = 2;
-  const qtyVal = document.getElementById('qtyVal');
-  const totalLabel = document.getElementById('totalLabel');
-  const totalVal = document.getElementById('totalVal');
-  const stickyTotal = document.getElementById('stickyTotal');
-  function fmt(n){ return n.toLocaleString('en-US'); }
+  const qtyVal = byId('qtyVal');
+  const totalLabel = byId('totalLabel');
+  const totalVal = byId('totalVal');
+  const stickyTotal = byId('stickyTotal');
   function updateTotal(bump){
     qtyVal.textContent = qty;
-    if(bump){ qtyVal.classList.remove('bump'); void qtyVal.offsetWidth; qtyVal.classList.add('bump'); }
+    if(bump){ restartAnimation(qtyVal, 'bump'); }
     const total = unitPrice * qty;
     totalLabel.textContent = `السعر الإجمالي ${fmt(unitPrice)} دج × ${qty} كرتون`;
     totalVal.textContent = `${fmt(total)} دج`;
     stickyTotal.textContent = `${fmt(total)} دج`;
-    totalVal.classList.remove('flash'); void totalVal.offsetWidth; totalVal.classList.add('flash');
+    restartAnimation(totalVal, 'flash');
   }
-  document.getElementById('plusBtn').addEventListener('click', ()=>{ qty++; updateTotal(true); });
-  document.getElementById('minusBtn').addEventListener('click', ()=>{ if(qty>1){ qty--; updateTotal(true); } });
+  byId('plusBtn').addEventListener('click', ()=>{ qty++; updateTotal(true); });
+  byId('minusBtn').addEventListener('click', ()=>{ if(qty>1){ qty--; updateTotal(true); } });
   updateTotal(false);
 
   /* ---- button ripple ---- */
@@ -1193,10 +1192,26 @@
     });
   });
 
-  /* ---- form submit ---- */
-  const toast = document.getElementById('toast');
-  document.getElementById('orderForm').addEventListener('submit', (e)=>{
+  /* ---- form submit: confirm, hand the order to WhatsApp, then reset ---- */
+  const toast = byId('toast');
+  const WHATSAPP_NUMBER = '213778188638';
+  const fieldValue = (id)=>{ const el = byId(id); return el ? el.value.trim() : ''; };
+  byId('orderForm').addEventListener('submit', (e)=>{
     e.preventDefault();
+
+    const message =
+`مرحباً، أريد تسجيل طلب جديد من موقع الفاخر الأوراس:
+
+الاسم الكامل: ${fieldValue('f-name')}
+اسم الشركة: ${fieldValue('f-company') || '-'}
+رقم الهاتف: ${fieldValue('f-phone')}
+الولاية: ${fieldValue('f-state')}
+المدينة: ${fieldValue('f-city')}
+عدد الكراتين: ${qty}
+السعر الإجمالي: ${totalVal.textContent.trim()}`;
+
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+
     toast.classList.add('show');
     setTimeout(()=>toast.classList.remove('show'), 2600);
     e.target.reset();
@@ -1204,9 +1219,9 @@
   });
 
   /* ---- testimonials autoplay ---- */
-  const testScroll = document.getElementById('testScroll');
+  const testScroll = byId('testScroll');
   const tCards = [...testScroll.children];
-  const progressBar = document.getElementById('testProgressBar');
+  const progressBar = byId('testProgressBar');
   let tIndex = 0, tTimer, pTimer;
   const AUTO_DELAY = 4200;
   function goToTestimonial(i){
@@ -1233,50 +1248,6 @@
   testScroll.addEventListener('touchstart', stopAutoplay, {passive:true});
   testScroll.addEventListener('touchend', ()=>setTimeout(startAutoplay, 3000), {passive:true});
   startAutoplay();
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('orderForm');
-  if (!form) return;
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-
-    const get = id => {
-      const el = document.getElementById(id);
-      return el ? el.value.trim() : '';
-    };
-
-    const name = get('f-name');
-    const company = get('f-company');
-    const phone = get('f-phone');
-    const state = get('f-state');
-    const city = get('f-city');
-    const qtyEl = document.getElementById('qtyVal');
-    const totalEl = document.getElementById('totalVal');
-
-    const qty = qtyEl ? qtyEl.textContent.trim() : '2';
-    const total = totalEl ? totalEl.textContent.trim() : '';
-
-    const message =
-`مرحباً، أريد تسجيل طلب جديد من موقع الفاخر الأوراس:
-
-الاسم الكامل: ${name}
-اسم الشركة: ${company || '-'}
-رقم الهاتف: ${phone}
-الولاية: ${state}
-المدينة: ${city}
-عدد الكراتين: ${qty}
-السعر الإجمالي: ${total}`;
-
-    const whatsappNumber = '213778188638';
-    window.open(
-      'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(message),
-      '_blank'
-    );
-  });
-});
 </script>
 
 </body>
