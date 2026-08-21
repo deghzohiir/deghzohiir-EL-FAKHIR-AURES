@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
 <meta name="description" content="الفاخر الأوراس — عيدان تحريك قهوة خشبية طبيعية 100%، صناعة جزائرية فاخرة بجودة عالمية.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; form-action 'none'; base-uri 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>الفاخر الأوراس | عيدان تحريك خشبية فاخرة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -890,11 +892,11 @@
       <div style="text-align:left"><div class="p">6400</div><div class="u">قطعة خشب طبيعي 100%</div></div>
     </div>
     <form id="orderForm">
-      <div class="field"><input type="text" placeholder=" " required id="f-name"><label for="f-name">الاسم الكامل</label></div>
-      <div class="field"><input type="text" placeholder=" " id="f-company"><label for="f-company">اسم الشركة</label></div>
-      <div class="field"><input type="tel" placeholder=" " required id="f-phone"><label for="f-phone">رقم الهاتف</label></div>
-      <div class="field"><input type="text" placeholder=" " required id="f-state"><label for="f-state">الولاية</label></div>
-      <div class="field"><input type="text" placeholder=" " required id="f-city"><label for="f-city">المدينة</label></div>
+      <div class="field"><input type="text" placeholder=" " required id="f-name" name="name" maxlength="80" autocomplete="name"><label for="f-name">الاسم الكامل</label></div>
+      <div class="field"><input type="text" placeholder=" " id="f-company" name="company" maxlength="80" autocomplete="organization"><label for="f-company">اسم الشركة</label></div>
+      <div class="field"><input type="tel" placeholder=" " required id="f-phone" name="phone" maxlength="20" inputmode="tel" pattern="[0-9+()\s-]{8,20}" autocomplete="tel"><label for="f-phone">رقم الهاتف</label></div>
+      <div class="field"><input type="text" placeholder=" " required id="f-state" name="state" maxlength="60"><label for="f-state">الولاية</label></div>
+      <div class="field"><input type="text" placeholder=" " required id="f-city" name="city" maxlength="60"><label for="f-city">المدينة</label></div>
       <div class="qty-row">
         <span class="lbl">عدد الكراتين</span>
         <div class="qty-ctrl">
@@ -1172,7 +1174,8 @@
     stickyTotal.textContent = `${fmt(total)} دج`;
     totalVal.classList.remove('flash'); void totalVal.offsetWidth; totalVal.classList.add('flash');
   }
-  document.getElementById('plusBtn').addEventListener('click', ()=>{ qty++; updateTotal(true); });
+  const MAX_QTY = 999;
+  document.getElementById('plusBtn').addEventListener('click', ()=>{ if(qty<MAX_QTY){ qty++; updateTotal(true); } });
   document.getElementById('minusBtn').addEventListener('click', ()=>{ if(qty>1){ qty--; updateTotal(true); } });
   updateTotal(false);
 
@@ -1199,9 +1202,11 @@
     e.preventDefault();
     toast.classList.add('show');
     setTimeout(()=>toast.classList.remove('show'), 2600);
-    e.target.reset();
-    qty = 2; updateTotal(false);
   });
+  window.resetOrderForm = (form)=>{
+    form.reset();
+    qty = 2; updateTotal(false);
+  };
 
   /* ---- testimonials autoplay ---- */
   const testScroll = document.getElementById('testScroll');
@@ -1273,8 +1278,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const whatsappNumber = '213778188638';
     window.open(
       'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(message),
-      '_blank'
+      '_blank',
+      'noopener,noreferrer'
     );
+
+    window.resetOrderForm?.(form);
   });
 });
 </script>
